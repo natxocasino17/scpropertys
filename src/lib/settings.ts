@@ -75,6 +75,8 @@ export interface SiteSettings {
   // Footer
   footerTaglineEs: string
   footerTaglineEn: string
+  // Managed list of property locations / zones (single source of truth)
+  zones: string[]
   whatsapp: string
   phoneDisplay: string
   email: string
@@ -162,6 +164,17 @@ export const defaultSettings: SiteSettings = {
   contactSubtitleEn: en.contact.subtitle,
   footerTaglineEs: es.footer.tagline,
   footerTaglineEn: en.footer.tagline,
+  zones: [
+    'Cahuita',
+    'Cocles',
+    'Hone Creek',
+    'Manzanillo',
+    'Playa Chiquita',
+    'Playa Negra',
+    'Puerto Viejo',
+    'Punta Cocles',
+    'Punta Uva',
+  ],
   whatsapp: siteConfig.contact.whatsapp,
   phoneDisplay: siteConfig.contact.phoneDisplay,
   email: siteConfig.contact.email,
@@ -199,6 +212,19 @@ export async function fetchSettings(): Promise<SiteSettings> {
   if (error || !data?.data) return { ...defaultSettings }
   // Merge so any missing/new field falls back to a sensible default.
   return { ...defaultSettings, ...(data.data as Partial<SiteSettings>) }
+}
+
+/** Add a zone to the managed list (case-insensitive dedup) and persist it. */
+export async function addZone(name: string): Promise<string[]> {
+  const clean = name.trim()
+  if (!clean) return getSettings().zones
+  const current = await fetchSettings()
+  const exists = current.zones.some((z) => z.toLowerCase() === clean.toLowerCase())
+  const zones = exists
+    ? current.zones
+    : [...current.zones, clean].sort((a, b) => a.localeCompare(b))
+  if (!exists) await saveSettings({ ...current, zones })
+  return zones
 }
 
 export async function saveSettings(settings: SiteSettings): Promise<void> {

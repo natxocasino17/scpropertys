@@ -241,6 +241,11 @@ export const translations = {
       ctaSection: 'Inicio · Sección final (Hablemos)',
       portfolioSection: 'Página · Portafolio (encabezado)',
       contactHeaderSection: 'Página · Contacto (encabezado)',
+      zonesSection: 'Zonas / Localidades',
+      zonesHint: 'Estas son las localidades que aparecen al crear una propiedad y en los filtros de la web. Edita o borra; los cambios se guardan con el botón Guardar.',
+      newZone: 'Nueva zona',
+      newZonePlaceholder: 'Ej. Cahuita',
+      selectZone: 'Elige una zona…',
     },
   },
 
@@ -484,6 +489,11 @@ export const translations = {
       ctaSection: 'Home · Final section (Let’s talk)',
       portfolioSection: 'Page · Portfolio (header)',
       contactHeaderSection: 'Page · Contact (header)',
+      zonesSection: 'Zones / Locations',
+      zonesHint: 'These are the locations shown when creating a property and in the site filters. Edit or delete; changes save with the Save button.',
+      newZone: 'New zone',
+      newZonePlaceholder: 'e.g. Cahuita',
+      selectZone: 'Choose a zone…',
     },
   },
 }

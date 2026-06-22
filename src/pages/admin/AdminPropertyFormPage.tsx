@@ -5,6 +5,9 @@ import { AdminLayout } from '../../components/admin/AdminLayout'
 import { ImageManager } from '../../components/admin/ImageManager'
 import { Spinner } from '../../components/ui/Spinner'
 import { useLanguage } from '../../i18n/LanguageContext'
+import { useSettings } from '../../context/SettingsContext'
+import { addZone } from '../../lib/settings'
+import { Plus, Check as CheckIcon, X as XIcon } from 'lucide-react'
 import {
   adminFetchPropertyById,
   createProperty,
@@ -248,13 +251,7 @@ export default function AdminPropertyFormPage() {
             </div>
             <div>
               <label className={label}>{t.filters.zone}</label>
-              <input
-                required
-                value={form.zone}
-                onChange={(e) => set('zone', e.target.value)}
-                placeholder="Puerto Viejo, Cocles…"
-                className={input}
-              />
+              <ZonePicker value={form.zone} onChange={(v) => set('zone', v)} />
             </div>
             <div>
               <label className={label}>{t.detail.land} (m²)</label>
@@ -409,6 +406,79 @@ export default function AdminPropertyFormPage() {
         </div>
       </form>
     </AdminLayout>
+  )
+}
+
+function ZonePicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const { t } = useLanguage()
+  const { settings, reload } = useSettings()
+  const [adding, setAdding] = useState(false)
+  const [newZone, setNewZone] = useState('')
+  const [busy, setBusy] = useState(false)
+  const zones = settings.zones ?? []
+
+  const input =
+    'w-full rounded-xl border border-white/15 bg-ink-800 px-4 py-2.5 text-sm text-cream placeholder:text-faint focus:border-gold focus:outline-none'
+
+  async function confirmAdd() {
+    const clean = newZone.trim()
+    if (!clean) return
+    setBusy(true)
+    try {
+      await addZone(clean)
+      await reload()
+      onChange(clean)
+      setNewZone('')
+      setAdding(false)
+    } catch (e) {
+      alert((e as Error).message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  if (adding) {
+    return (
+      <div className="flex gap-2">
+        <input
+          autoFocus
+          value={newZone}
+          onChange={(e) => setNewZone(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), confirmAdd())}
+          placeholder={t.admin.newZonePlaceholder}
+          className={input}
+        />
+        <button type="button" onClick={confirmAdd} disabled={busy} className="grid h-10 w-11 shrink-0 place-items-center rounded-xl bg-gold text-ink disabled:opacity-60">
+          <CheckIcon size={16} />
+        </button>
+        <button type="button" onClick={() => { setAdding(false); setNewZone('') }} className="grid h-10 w-11 shrink-0 place-items-center rounded-xl border border-white/15 text-cream/70">
+          <XIcon size={16} />
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex gap-2">
+      <select required value={value} onChange={(e) => onChange(e.target.value)} className={input}>
+        <option value="">{t.admin.selectZone}</option>
+        {/* Keep a non-listed legacy value selectable so old data still shows */}
+        {value && !zones.includes(value) && <option value={value}>{value}</option>}
+        {zones.map((z) => (
+          <option key={z} value={z}>
+            {z}
+          </option>
+        ))}
+      </select>
+      <button
+        type="button"
+        onClick={() => setAdding(true)}
+        title={t.admin.newZone}
+        className="inline-flex shrink-0 items-center gap-1 rounded-xl border border-gold/40 bg-gold/10 px-3 text-sm text-gold hover:bg-gold/20"
+      >
+        <Plus size={15} /> {t.admin.newZone}
+      </button>
+    </div>
   )
 }
 

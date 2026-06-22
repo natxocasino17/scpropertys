@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import { Save, Loader2, Check, Upload, Link2, Image as ImageIcon, Star } from 'lucide-react'
+import { Save, Loader2, Check, Upload, Link2, Image as ImageIcon, Star, Plus, Trash2 } from 'lucide-react'
 import { AdminLayout } from '../../components/admin/AdminLayout'
 import { Spinner } from '../../components/ui/Spinner'
 import { useLanguage } from '../../i18n/LanguageContext'
@@ -231,6 +231,12 @@ export default function AdminSettingsPage() {
           {bi(t.admin.footerTagline, 'footerTaglineEs', 'footerTaglineEn')}
         </Section>
 
+        {/* Zones / locations */}
+        <Section title={t.admin.zonesSection}>
+          <p className="mb-4 text-xs text-faint">{t.admin.zonesHint}</p>
+          <ZonesEditor zones={form.zones} onChange={(z) => set('zones', z)} />
+        </Section>
+
         {/* Contact */}
         <Section title={t.admin.contactSection}>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -381,6 +387,59 @@ function StatEditor({
           <label className={label}>{t.admin.statLabelEnLabel}</label>
           <input value={stat.labelEn} onChange={(e) => onChange({ ...stat, labelEn: e.target.value })} className={input} />
         </div>
+      </div>
+    </div>
+  )
+}
+
+function ZonesEditor({ zones, onChange }: { zones: string[]; onChange: (z: string[]) => void }) {
+  const { t } = useLanguage()
+  const [newZone, setNewZone] = useState('')
+  const input =
+    'w-full rounded-xl border border-white/15 bg-ink-800 px-3 py-2 text-sm text-cream placeholder:text-faint focus:border-gold focus:outline-none'
+
+  function add() {
+    const clean = newZone.trim()
+    if (!clean) return
+    if (zones.some((z) => z.toLowerCase() === clean.toLowerCase())) {
+      setNewZone('')
+      return
+    }
+    onChange([...zones, clean].sort((a, b) => a.localeCompare(b)))
+    setNewZone('')
+  }
+
+  function rename(i: number, name: string) {
+    onChange(zones.map((z, idx) => (idx === i ? name : z)))
+  }
+
+  function remove(i: number) {
+    onChange(zones.filter((_, idx) => idx !== i))
+  }
+
+  return (
+    <div>
+      <div className="mb-3 flex gap-2">
+        <input
+          value={newZone}
+          onChange={(e) => setNewZone(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), add())}
+          placeholder={t.admin.newZonePlaceholder}
+          className={input}
+        />
+        <button type="button" onClick={add} className="inline-flex shrink-0 items-center gap-1 rounded-xl border border-gold/40 bg-gold/10 px-4 text-sm text-gold hover:bg-gold/20">
+          <Plus size={15} /> {t.admin.newZone}
+        </button>
+      </div>
+      <div className="space-y-2">
+        {zones.map((z, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <input value={z} onChange={(e) => rename(i, e.target.value)} className={input} />
+            <button type="button" onClick={() => remove(i)} className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-cream/60 hover:bg-white/5 hover:text-rose-300">
+              <Trash2 size={16} />
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   )
