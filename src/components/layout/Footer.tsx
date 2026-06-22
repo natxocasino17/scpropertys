@@ -2,17 +2,18 @@ import { Link } from 'react-router-dom'
 import { Instagram, Facebook, Youtube, Mail, Phone, MapPin } from 'lucide-react'
 import { Logo } from '../ui/Logo'
 import { useLanguage } from '../../i18n/LanguageContext'
-import { siteConfig } from '../../config/siteConfig'
+import { useSettings } from '../../context/SettingsContext'
 import { whatsappLink } from '../../lib/format'
 
 export function Footer() {
   const { t, lang } = useLanguage()
+  const { settings } = useSettings()
   const year = new Date().getFullYear()
 
   const socials = [
-    { url: siteConfig.social.instagram, Icon: Instagram, label: 'Instagram' },
-    { url: siteConfig.social.facebook, Icon: Facebook, label: 'Facebook' },
-    { url: siteConfig.social.youtube, Icon: Youtube, label: 'YouTube' },
+    { url: settings.instagram, Icon: Instagram, label: 'Instagram' },
+    { url: settings.facebook, Icon: Facebook, label: 'Facebook' },
+    { url: settings.youtube, Icon: Youtube, label: 'YouTube' },
   ].filter((s) => s.url)
 
   return (
@@ -66,7 +67,7 @@ export function Footer() {
             <ul className="space-y-4 text-sm text-mist">
               <li className="flex items-start gap-3">
                 <MapPin size={16} className="mt-0.5 shrink-0 text-gold" />
-                <span>{siteConfig.contact.location[lang]}</span>
+                <span>{lang === 'es' ? settings.locationEs : settings.locationEn}</span>
               </li>
               <li>
                 <a
@@ -76,16 +77,16 @@ export function Footer() {
                   className="flex items-center gap-3 transition-colors hover:text-gold"
                 >
                   <Phone size={16} className="shrink-0 text-gold" />
-                  {siteConfig.contact.phoneDisplay}
+                  {settings.phoneDisplay}
                 </a>
               </li>
               <li>
                 <a
-                  href={`mailto:${siteConfig.contact.email}`}
+                  href={`mailto:${settings.email}`}
                   className="flex items-center gap-3 transition-colors hover:text-gold"
                 >
                   <Mail size={16} className="shrink-0 text-gold" />
-                  {siteConfig.contact.email}
+                  {settings.email}
                 </a>
               </li>
             </ul>
@@ -94,7 +95,7 @@ export function Footer() {
 
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-xs text-faint sm:flex-row">
           <p>
-            © {year} {siteConfig.brand} {siteConfig.brandSuffix}. {t.footer.rights}
+            © {year} {settings.brand} {settings.brandSuffix}. {t.footer.rights}
           </p>
           <p className="tracking-wide">{t.footer.crafted}</p>
         </div>

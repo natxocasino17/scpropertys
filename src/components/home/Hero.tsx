@@ -3,12 +3,12 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
 import { ArrowDown } from 'lucide-react'
 import { useLanguage } from '../../i18n/LanguageContext'
-
-const HERO_IMG =
-  'https://images.unsplash.com/photo-1602343168117-bb8ffe3e2e9f?auto=format&fit=crop&w=2400&q=85'
+import { useSettings } from '../../context/SettingsContext'
 
 export function Hero() {
   const { t } = useLanguage()
+  const { settings } = useSettings()
+  const HERO_IMG = settings.heroImage
   const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '22%'])

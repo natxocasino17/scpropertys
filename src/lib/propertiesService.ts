@@ -86,6 +86,19 @@ export async function deleteProperty(id: string): Promise<void> {
   if (error) throw error
 }
 
+/** Insert the demo properties as real, editable rows. */
+export async function importDemoProperties(): Promise<number> {
+  const supabase = getSupabase()
+  if (!supabase) throw new Error('not-configured')
+  const rows = demoProperties.map(({ id, created_at, ...rest }) => rest)
+  const { data, error } = await supabase
+    .from(TABLES.properties)
+    .upsert(rows, { onConflict: 'slug' })
+    .select('id')
+  if (error) throw error
+  return data?.length ?? 0
+}
+
 export async function adminFetchPropertyById(id: string): Promise<Property | null> {
   const supabase = getSupabase()
   if (!supabase) return null

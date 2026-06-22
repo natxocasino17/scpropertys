@@ -10,6 +10,7 @@ export const DB_PREFIX = (import.meta.env.VITE_DB_PREFIX as string | undefined) 
 export const TABLES = {
   properties: `${DB_PREFIX}properties`,
   leads: `${DB_PREFIX}leads`,
+  settings: `${DB_PREFIX}settings`,
 }
 
 /** Storage bucket name (Supabase buckets can't contain "_", so we use "-"). */

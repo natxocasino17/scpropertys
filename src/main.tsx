@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { LanguageProvider } from './i18n/LanguageContext'
 import { AuthProvider } from './context/AuthContext'
+import { SettingsProvider } from './context/SettingsContext'
 import './index.css'
 import 'leaflet/dist/leaflet.css'
 
@@ -11,9 +12,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
       <LanguageProvider>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
+        <SettingsProvider>
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+        </SettingsProvider>
       </LanguageProvider>
     </BrowserRouter>
   </React.StrictMode>,

@@ -18,6 +18,7 @@ const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage'))
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
 const AdminPropertyFormPage = lazy(() => import('./pages/admin/AdminPropertyFormPage'))
 const AdminLeadsPage = lazy(() => import('./pages/admin/AdminLeadsPage'))
+const AdminSettingsPage = lazy(() => import('./pages/admin/AdminSettingsPage'))
 
 function Loader() {
   return (
@@ -85,6 +86,14 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <AdminLeadsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/settings"
+              element={
+                <ProtectedRoute>
+                  <AdminSettingsPage />
                 </ProtectedRoute>
               }
             />

@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Inbox, LogOut, ExternalLink } from 'lucide-react'
+import { LayoutDashboard, Inbox, LogOut, ExternalLink, Settings } from 'lucide-react'
 import { Logo } from '../ui/Logo'
 import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../i18n/LanguageContext'
@@ -19,6 +19,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   const nav = [
     { to: '/admin', label: t.admin.properties, Icon: LayoutDashboard, end: true },
     { to: '/admin/leads', label: t.admin.leads, Icon: Inbox, end: false },
+    { to: '/admin/settings', label: t.admin.settings, Icon: Settings, end: false },
   ]
 
   return (
@@ -75,6 +76,9 @@ export function AdminLayout({ children }: { children: ReactNode }) {
           </NavLink>
           <NavLink to="/admin/leads" className="rounded-lg p-2 text-cream/70">
             <Inbox size={20} />
+          </NavLink>
+          <NavLink to="/admin/settings" className="rounded-lg p-2 text-cream/70">
+            <Settings size={20} />
           </NavLink>
           <button onClick={handleSignOut} className="rounded-lg p-2 text-cream/70">
             <LogOut size={20} />

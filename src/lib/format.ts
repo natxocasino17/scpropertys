@@ -1,4 +1,5 @@
 import { siteConfig } from '../config/siteConfig'
+import { getSettings } from './settings'
 
 export function formatPrice(value: number): string {
   if (!value || value <= 0) return ''
@@ -14,9 +15,10 @@ export function formatArea(m2: number): string {
   return `${new Intl.NumberFormat('en-US').format(m2)} m²`
 }
 
-/** Build a WhatsApp deep link with a pre-filled message. */
+/** Build a WhatsApp deep link with a pre-filled message. Uses the live, admin-editable number. */
 export function whatsappLink(message: string): string {
-  const num = siteConfig.contact.whatsapp.replace(/\D/g, '')
+  const raw = getSettings().whatsapp || siteConfig.contact.whatsapp
+  const num = raw.replace(/\D/g, '')
   return `https://wa.me/${num}?text=${encodeURIComponent(message)}`
 }
 

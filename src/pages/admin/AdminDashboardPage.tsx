@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Pencil, Trash2, ImageOff } from 'lucide-react'
+import { Plus, Pencil, Trash2, ImageOff, Download, Loader2 } from 'lucide-react'
 import { AdminLayout } from '../../components/admin/AdminLayout'
 import { Spinner } from '../../components/ui/Spinner'
 import { StatusBadge } from '../../components/property/StatusBadge'
 import { useLanguage } from '../../i18n/LanguageContext'
-import { adminFetchProperties, deleteProperty } from '../../lib/propertiesService'
+import { adminFetchProperties, deleteProperty, importDemoProperties } from '../../lib/propertiesService'
 import { formatPrice } from '../../lib/format'
 import type { Property } from '../../types/property'
 
@@ -14,6 +14,19 @@ export default function AdminDashboardPage() {
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState<string | null>(null)
+  const [importing, setImporting] = useState(false)
+
+  async function handleImportDemo() {
+    setImporting(true)
+    try {
+      await importDemoProperties()
+      await load()
+    } catch (e) {
+      alert((e as Error).message)
+    } finally {
+      setImporting(false)
+    }
+  }
 
   async function load() {
     setLoading(true)
@@ -61,9 +74,16 @@ export default function AdminDashboardPage() {
         ) : properties.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-white/15 py-20 text-center">
             <p className="text-mist">{t.admin.noProps}</p>
-            <Link to="/admin/properties/new" className="btn-ghost mt-6">
-              <Plus size={16} /> {t.admin.newProperty}
-            </Link>
+            <p className="mx-auto mt-2 max-w-sm text-xs text-faint">{t.admin.importDemoDesc}</p>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Link to="/admin/properties/new" className="btn-gold">
+                <Plus size={16} /> {t.admin.newProperty}
+              </Link>
+              <button onClick={handleImportDemo} disabled={importing} className="btn-ghost disabled:opacity-60">
+                {importing ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+                {importing ? t.admin.importing : t.admin.importDemo}
+              </button>
+            </div>
           </div>
         ) : (
           <div className="space-y-3">

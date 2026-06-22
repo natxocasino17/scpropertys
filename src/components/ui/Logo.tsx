@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { siteConfig } from '../../config/siteConfig'
+import { useSettings } from '../../context/SettingsContext'
 
 interface LogoProps {
   className?: string
@@ -8,6 +8,7 @@ interface LogoProps {
 
 /** Elegant typographic logotype with a minimalist gold monogram. */
 export function Logo({ className = '', onClick }: LogoProps) {
+  const { settings } = useSettings()
   return (
     <Link to="/" onClick={onClick} className={`group inline-flex items-center gap-3 ${className}`}>
       <span className="relative grid h-9 w-9 place-items-center rounded-full border border-gold/40 transition-colors duration-500 group-hover:border-gold">
@@ -24,10 +25,10 @@ export function Logo({ className = '', onClick }: LogoProps) {
       </span>
       <span className="flex flex-col leading-none">
         <span className="font-display text-lg font-semibold tracking-wide text-cream">
-          {siteConfig.brand}
+          {settings.brand}
         </span>
         <span className="text-[9px] uppercase tracking-luxe text-gold/80">
-          {siteConfig.brandSuffix}
+          {settings.brandSuffix}
         </span>
       </span>
     </Link>

@@ -1,9 +1,11 @@
 import { motion } from 'framer-motion'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useSettings } from '../context/SettingsContext'
 import { whatsappLink } from '../lib/format'
 
 export function WhatsAppFloat() {
   const { t } = useLanguage()
+  useSettings() // re-render when the admin updates the WhatsApp number
   return (
     <motion.a
       href={whatsappLink(t.contact.prefillGeneric)}

@@ -53,11 +53,28 @@ create table if not exists public.sc_leads (
 
 create index if not exists sc_leads_created_idx on public.sc_leads (created_at desc);
 
+-- ───────────── Site settings (editable from the admin) ─────────────
+create table if not exists public.sc_settings (
+  id text primary key default 'main',
+  data jsonb not null default '{}',
+  updated_at timestamptz not null default now()
+);
+
 -- ════════════════════════════════════════════════════════════════════
 --  Row Level Security
 -- ════════════════════════════════════════════════════════════════════
 alter table public.sc_properties enable row level security;
 alter table public.sc_leads enable row level security;
+alter table public.sc_settings enable row level security;
+
+drop policy if exists "sc_settings public read" on public.sc_settings;
+create policy "sc_settings public read"
+  on public.sc_settings for select using (true);
+
+drop policy if exists "sc_settings admin write" on public.sc_settings;
+create policy "sc_settings admin write"
+  on public.sc_settings for all to authenticated
+  using (true) with check (true);
 
 -- Properties: anyone can READ; only logged-in admin can write.
 drop policy if exists "sc_properties public read" on public.sc_properties;

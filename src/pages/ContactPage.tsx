@@ -5,7 +5,7 @@ import { PublicLayout } from '../components/layout/PublicLayout'
 import { LazyMap } from '../components/property/LazyMap'
 import { Reveal } from '../components/ui/Reveal'
 import { useLanguage } from '../i18n/LanguageContext'
-import { siteConfig } from '../config/siteConfig'
+import { useSettings } from '../context/SettingsContext'
 import { submitLead } from '../lib/propertiesService'
 import { whatsappLink } from '../lib/format'
 
@@ -13,6 +13,7 @@ type Status = 'idle' | 'sending' | 'success' | 'error'
 
 export default function ContactPage() {
   const { t, lang } = useLanguage()
+  const { settings } = useSettings()
   const [status, setStatus] = useState<Status>('idle')
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
 
@@ -28,7 +29,7 @@ export default function ContactPage() {
         const body = encodeURIComponent(
           `${form.message}\n\n${form.name} · ${form.email} · ${form.phone}`,
         )
-        window.location.href = `mailto:${siteConfig.contact.email}?subject=${encodeURIComponent(
+        window.location.href = `mailto:${settings.email}?subject=${encodeURIComponent(
           'Web — ' + form.name,
         )}&body=${body}`
       }
@@ -158,34 +159,34 @@ export default function ContactPage() {
         {/* Contact info + map */}
         <Reveal delay={0.1}>
           <div className="space-y-5">
-            <InfoRow Icon={MapPin} label={t.contact.office} value={siteConfig.contact.location[lang]} />
+            <InfoRow
+              Icon={MapPin}
+              label={t.contact.office}
+              value={lang === 'es' ? settings.locationEs : settings.locationEn}
+            />
             <InfoRow
               Icon={Phone}
               label="WhatsApp"
-              value={siteConfig.contact.phoneDisplay}
+              value={settings.phoneDisplay}
               href={whatsappLink(t.contact.prefillGeneric)}
             />
             <InfoRow
               Icon={Mail}
               label={t.contact.email}
-              value={siteConfig.contact.email}
-              href={`mailto:${siteConfig.contact.email}`}
+              value={settings.email}
+              href={`mailto:${settings.email}`}
             />
 
             <div className="flex items-center gap-3 pt-1">
-              {siteConfig.social.instagram && (
-                <SocialBtn href={siteConfig.social.instagram} Icon={Instagram} />
-              )}
-              {siteConfig.social.facebook && (
-                <SocialBtn href={siteConfig.social.facebook} Icon={Facebook} />
-              )}
+              {settings.instagram && <SocialBtn href={settings.instagram} Icon={Instagram} />}
+              {settings.facebook && <SocialBtn href={settings.facebook} Icon={Facebook} />}
             </div>
 
             <LazyMap
-              lat={siteConfig.region.center.lat}
-              lng={siteConfig.region.center.lng}
-              zoom={siteConfig.region.zoom}
-              label={siteConfig.contact.location[lang]}
+              lat={settings.regionLat}
+              lng={settings.regionLng}
+              zoom={settings.regionZoom}
+              label={lang === 'es' ? settings.locationEs : settings.locationEn}
               className="h-72"
             />
           </div>
