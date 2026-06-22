@@ -48,11 +48,9 @@ export default function PropertiesPage() {
       return matchSearch && matchType && matchZone && matchDwelling
     })
 
-    list = [...list].sort((a, b) => {
-      if (sort === 'priceAsc') return a.price - b.price
-      if (sort === 'priceDesc') return b.price - a.price
-      return (b.created_at ?? '').localeCompare(a.created_at ?? '')
-    })
+    if (sort === 'priceAsc') list = [...list].sort((a, b) => a.price - b.price)
+    else if (sort === 'priceDesc') list = [...list].sort((a, b) => b.price - a.price)
+    // 'new' = keep the manual admin order (best on top) that comes from the DB.
     return list
   }, [properties, search, type, zone, dwelling, sort, lang])
 

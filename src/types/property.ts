@@ -49,10 +49,12 @@ export interface Property {
   lat?: number | null
   lng?: number | null
   featured: boolean
+  /** Manual display order (lower = shown first). Managed from the admin list. */
+  position?: number
   created_at?: string
 }
 
-export type PropertyInput = Omit<Property, 'id' | 'created_at'>
+export type PropertyInput = Omit<Property, 'id' | 'created_at' | 'position'>
 
 export interface Lead {
   id?: string

@@ -70,7 +70,7 @@ export const translations = {
       withDwelling: 'Con vivienda',
       withoutDwelling: 'Solo lote',
       sort: 'Ordenar',
-      sortNew: 'Más recientes',
+      sortNew: 'Recomendado',
       sortPriceAsc: 'Precio: menor a mayor',
       sortPriceDesc: 'Precio: mayor a menor',
       clear: 'Limpiar filtros',
@@ -230,6 +230,7 @@ export const translations = {
       statLabelEsLabel: 'Texto (ES)',
       statLabelEnLabel: 'Texto (EN)',
       starsOption: '★ 5 estrellas',
+      reorderHint: 'Usa las flechas ▲▼ para ordenar: arriba las mejores, abajo las demás. El orden se guarda solo y así se ve en la web.',
     },
   },
 
@@ -302,7 +303,7 @@ export const translations = {
       withDwelling: 'With home',
       withoutDwelling: 'Lot only',
       sort: 'Sort',
-      sortNew: 'Newest',
+      sortNew: 'Recommended',
       sortPriceAsc: 'Price: low to high',
       sortPriceDesc: 'Price: high to low',
       clear: 'Clear filters',
@@ -462,6 +463,7 @@ export const translations = {
       statLabelEsLabel: 'Text (ES)',
       statLabelEnLabel: 'Text (EN)',
       starsOption: '★ 5 stars',
+      reorderHint: 'Use the ▲▼ arrows to sort: best on top, the rest below. The order saves automatically and is reflected on the site.',
     },
   },
 }

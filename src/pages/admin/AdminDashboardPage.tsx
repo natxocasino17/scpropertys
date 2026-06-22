@@ -1,11 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Pencil, Trash2, ImageOff, Download, Loader2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, ImageOff, Download, Loader2, ChevronUp, ChevronDown } from 'lucide-react'
 import { AdminLayout } from '../../components/admin/AdminLayout'
 import { Spinner } from '../../components/ui/Spinner'
 import { StatusBadge } from '../../components/property/StatusBadge'
 import { useLanguage } from '../../i18n/LanguageContext'
-import { adminFetchProperties, deleteProperty, importDemoProperties } from '../../lib/propertiesService'
+import {
+  adminFetchProperties,
+  deleteProperty,
+  importDemoProperties,
+  setPropertyPositions,
+} from '../../lib/propertiesService'
 import { formatPrice } from '../../lib/format'
 import type { Property } from '../../types/property'
 
@@ -15,6 +20,24 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState<string | null>(null)
   const [importing, setImporting] = useState(false)
+  const [savingOrder, setSavingOrder] = useState(false)
+
+  async function move(index: number, dir: -1 | 1) {
+    const target = index + dir
+    if (target < 0 || target >= properties.length) return
+    const next = [...properties]
+    ;[next[index], next[target]] = [next[target], next[index]]
+    setProperties(next) // optimistic
+    setSavingOrder(true)
+    try {
+      await setPropertyPositions(next.map((p) => p.id))
+    } catch (e) {
+      alert((e as Error).message)
+      load()
+    } finally {
+      setSavingOrder(false)
+    }
+  }
 
   async function handleImportDemo() {
     setImporting(true)
@@ -68,7 +91,13 @@ export default function AdminDashboardPage() {
         </Link>
       </div>
 
-      <div className="mt-8">
+      {properties.length > 1 && (
+        <p className="mt-4 rounded-xl border border-gold/20 bg-gold/5 px-4 py-3 text-xs leading-relaxed text-mist">
+          {t.admin.reorderHint}
+        </p>
+      )}
+
+      <div className="mt-6">
         {loading ? (
           <Spinner />
         ) : properties.length === 0 ? (
@@ -87,13 +116,34 @@ export default function AdminDashboardPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            {properties.map((p) => {
+            {properties.map((p, index) => {
               const title = lang === 'es' ? p.title_es : p.title_en
               return (
                 <div
                   key={p.id}
-                  className="flex items-center gap-4 rounded-2xl border border-white/10 bg-ink-800 p-3 transition-colors hover:border-white/20"
+                  className="flex items-center gap-3 rounded-2xl border border-white/10 bg-ink-800 p-3 transition-colors hover:border-white/20 sm:gap-4"
                 >
+                  {/* Reorder controls */}
+                  <div className="flex flex-col items-center">
+                    <button
+                      onClick={() => move(index, -1)}
+                      disabled={index === 0 || savingOrder}
+                      title="Subir"
+                      className="grid h-7 w-7 place-items-center rounded-md text-cream/60 hover:bg-white/5 hover:text-gold disabled:opacity-25"
+                    >
+                      <ChevronUp size={18} />
+                    </button>
+                    <span className="text-[10px] text-faint">{index + 1}</span>
+                    <button
+                      onClick={() => move(index, 1)}
+                      disabled={index === properties.length - 1 || savingOrder}
+                      title="Bajar"
+                      className="grid h-7 w-7 place-items-center rounded-md text-cream/60 hover:bg-white/5 hover:text-gold disabled:opacity-25"
+                    >
+                      <ChevronDown size={18} />
+                    </button>
+                  </div>
+
                   <div className="h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-ink-700">
                     {p.images[0] ? (
                       <img src={p.images[0]} alt={title} className="h-full w-full object-cover" />

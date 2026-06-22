@@ -32,8 +32,12 @@ create table if not exists public.sc_properties (
   lat double precision,
   lng double precision,
   featured boolean not null default false,
+  position int not null default 0,
   created_at timestamptz not null default now()
 );
+
+-- For existing installs: add the manual-order column if it isn't there yet.
+alter table public.sc_properties add column if not exists position int not null default 0;
 
 create index if not exists sc_properties_created_idx on public.sc_properties (created_at desc);
 create index if not exists sc_properties_slug_idx on public.sc_properties (slug);

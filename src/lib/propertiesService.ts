@@ -15,6 +15,7 @@ export async function fetchProperties(): Promise<FetchResult> {
   const { data, error } = await supabase
     .from(TABLES.properties)
     .select('*')
+    .order('position', { ascending: true })
     .order('created_at', { ascending: false })
 
   if (error || !data || data.length === 0) {
@@ -49,9 +50,21 @@ export async function adminFetchProperties(): Promise<Property[]> {
   const { data, error } = await supabase
     .from(TABLES.properties)
     .select('*')
+    .order('position', { ascending: true })
     .order('created_at', { ascending: false })
   if (error) throw error
   return (data ?? []) as Property[]
+}
+
+/** Persist a new manual order (best on top). Writes position = index for each id. */
+export async function setPropertyPositions(orderedIds: string[]): Promise<void> {
+  const supabase = getSupabase()
+  if (!supabase) throw new Error('not-configured')
+  await Promise.all(
+    orderedIds.map((id, index) =>
+      supabase.from(TABLES.properties).update({ position: index }).eq('id', id),
+    ),
+  )
 }
 
 export async function createProperty(input: PropertyInput): Promise<Property> {
