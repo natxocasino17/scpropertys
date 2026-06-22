@@ -1,7 +1,7 @@
 import {
   Home, Building2, MapPin, Map, Handshake, Star, Award, BadgeCheck,
   ShieldCheck, Clock, Calendar, Globe, Key, TrendingUp, Users, Heart,
-  Gem, Waves, TreePalm, Sun, ThumbsUp, Camera, Sparkles, Trophy,
+  Gem, Waves, TreePalm, Sun, ThumbsUp, Camera, Sparkles, Trophy, Eye,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -34,6 +34,7 @@ export const STAT_ICONS: Record<string, LucideIcon> = {
   sparkles: Sparkles,
   trophy: Trophy,
   star: Star,
+  eye: Eye,
 }
 
 /** All selectable icon keys for the admin picker ('stars' = 5-star rating). */

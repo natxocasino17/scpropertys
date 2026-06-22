@@ -1,12 +1,16 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useLanguage } from '../../i18n/LanguageContext'
+import { useSettings } from '../../context/SettingsContext'
 
 const BG =
   'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2400&q=80'
 
 export function CTASection() {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
+  const { settings } = useSettings()
+  const eyebrow = lang === 'es' ? settings.ctaEyebrowEs : settings.ctaEyebrowEn
+  const title = lang === 'es' ? settings.ctaTitleEs : settings.ctaTitleEn
   return (
     <section className="container-luxe py-12">
       <div className="relative overflow-hidden rounded-3xl border border-white/10">
@@ -30,7 +34,7 @@ export function CTASection() {
             transition={{ duration: 0.7 }}
             className="eyebrow"
           >
-            {t.contact.eyebrow}
+            {eyebrow}
           </motion.span>
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -39,7 +43,7 @@ export function CTASection() {
             transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             className="mx-auto mt-5 max-w-3xl font-display text-4xl font-medium leading-tight text-cream md:text-6xl"
           >
-            {t.contact.subtitle}
+            {title}
           </motion.h2>
           <motion.div
             initial={{ opacity: 0, y: 20 }}

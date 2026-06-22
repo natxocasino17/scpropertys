@@ -51,7 +51,7 @@ export default function ContactPage() {
           className="eyebrow flex items-center gap-3"
         >
           <span className="h-px w-8 bg-gold" />
-          {t.contact.eyebrow}
+          {lang === 'es' ? settings.contactEyebrowEs : settings.contactEyebrowEn}
         </motion.span>
         <motion.h1
           initial={{ opacity: 0, y: 24 }}
@@ -59,9 +59,11 @@ export default function ContactPage() {
           transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           className="mt-4 font-display text-5xl font-medium text-cream md:text-6xl"
         >
-          {t.contact.title}
+          {lang === 'es' ? settings.contactTitleEs : settings.contactTitleEn}
         </motion.h1>
-        <p className="mt-4 max-w-xl text-mist">{t.contact.subtitle}</p>
+        <p className="mt-4 max-w-xl text-mist">
+          {lang === 'es' ? settings.contactSubtitleEs : settings.contactSubtitleEn}
+        </p>
       </section>
 
       <section className="container-luxe grid gap-12 pb-24 lg:grid-cols-[1.1fr_1fr]">

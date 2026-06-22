@@ -9,6 +9,14 @@ export interface StatItem {
   labelEn: string
 }
 
+export interface ServiceItem {
+  icon: string
+  titleEs: string
+  titleEn: string
+  descEs: string
+  descEn: string
+}
+
 export interface SiteSettings {
   brand: string
   brandSuffix: string
@@ -23,6 +31,43 @@ export interface SiteSettings {
   heroSubtitleEn: string
   // Home stats strip
   stats: StatItem[]
+  // Featured section (home)
+  featuredEyebrowEs: string
+  featuredEyebrowEn: string
+  featuredTitleEs: string
+  featuredTitleEn: string
+  featuredSubtitleEs: string
+  featuredSubtitleEn: string
+  featuredCtaEs: string
+  featuredCtaEn: string
+  // Services section (home)
+  servicesEyebrowEs: string
+  servicesEyebrowEn: string
+  servicesTitleEs: string
+  servicesTitleEn: string
+  services: ServiceItem[]
+  // Final CTA section (home)
+  ctaEyebrowEs: string
+  ctaEyebrowEn: string
+  ctaTitleEs: string
+  ctaTitleEn: string
+  // Portfolio page header
+  portfolioEyebrowEs: string
+  portfolioEyebrowEn: string
+  portfolioTitleEs: string
+  portfolioTitleEn: string
+  portfolioSubtitleEs: string
+  portfolioSubtitleEn: string
+  // Contact page header
+  contactEyebrowEs: string
+  contactEyebrowEn: string
+  contactTitleEs: string
+  contactTitleEn: string
+  contactSubtitleEs: string
+  contactSubtitleEn: string
+  // Footer
+  footerTaglineEs: string
+  footerTaglineEn: string
   whatsapp: string
   phoneDisplay: string
   email: string
@@ -51,6 +96,13 @@ export const DEFAULT_STATS: StatItem[] = [
   { icon: 'stars', value: '★★★★★', labelEs: es.stats.satisfaction, labelEn: en.stats.satisfaction },
 ]
 
+export const DEFAULT_SERVICES: ServiceItem[] = [
+  { icon: 'gem', titleEs: es.services.items.curated.title, titleEn: en.services.items.curated.title, descEs: es.services.items.curated.desc, descEn: en.services.items.curated.desc },
+  { icon: 'pin', titleEs: es.services.items.local.title, titleEn: en.services.items.local.title, descEs: es.services.items.local.desc, descEn: en.services.items.local.desc },
+  { icon: 'eye', titleEs: es.services.items.tour.title, titleEn: en.services.items.tour.title, descEs: es.services.items.tour.desc, descEn: en.services.items.tour.desc },
+  { icon: 'handshake', titleEs: es.services.items.support.title, titleEn: en.services.items.support.title, descEs: es.services.items.support.desc, descEn: en.services.items.support.desc },
+]
+
 /** Defaults come from siteConfig / translations — the DB overrides them when present. */
 export const defaultSettings: SiteSettings = {
   brand: siteConfig.brand,
@@ -64,6 +116,37 @@ export const defaultSettings: SiteSettings = {
   heroSubtitleEs: es.hero.subtitle,
   heroSubtitleEn: en.hero.subtitle,
   stats: DEFAULT_STATS,
+  featuredEyebrowEs: es.featured.eyebrow,
+  featuredEyebrowEn: en.featured.eyebrow,
+  featuredTitleEs: es.featured.title,
+  featuredTitleEn: en.featured.title,
+  featuredSubtitleEs: es.featured.subtitle,
+  featuredSubtitleEn: en.featured.subtitle,
+  featuredCtaEs: es.featured.viewAll,
+  featuredCtaEn: en.featured.viewAll,
+  servicesEyebrowEs: es.services.eyebrow,
+  servicesEyebrowEn: en.services.eyebrow,
+  servicesTitleEs: es.services.title,
+  servicesTitleEn: en.services.title,
+  services: DEFAULT_SERVICES,
+  ctaEyebrowEs: es.contact.eyebrow,
+  ctaEyebrowEn: en.contact.eyebrow,
+  ctaTitleEs: es.contact.subtitle,
+  ctaTitleEn: en.contact.subtitle,
+  portfolioEyebrowEs: es.portfolio.eyebrow,
+  portfolioEyebrowEn: en.portfolio.eyebrow,
+  portfolioTitleEs: es.portfolio.title,
+  portfolioTitleEn: en.portfolio.title,
+  portfolioSubtitleEs: es.portfolio.subtitle,
+  portfolioSubtitleEn: en.portfolio.subtitle,
+  contactEyebrowEs: es.contact.eyebrow,
+  contactEyebrowEn: en.contact.eyebrow,
+  contactTitleEs: es.contact.title,
+  contactTitleEn: en.contact.title,
+  contactSubtitleEs: es.contact.subtitle,
+  contactSubtitleEn: en.contact.subtitle,
+  footerTaglineEs: es.footer.tagline,
+  footerTaglineEn: en.footer.tagline,
   whatsapp: siteConfig.contact.whatsapp,
   phoneDisplay: siteConfig.contact.phoneDisplay,
   email: siteConfig.contact.email,

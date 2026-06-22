@@ -6,6 +6,7 @@ import { PropertyCard } from '../components/property/PropertyCard'
 import { Spinner } from '../components/ui/Spinner'
 import { useProperties } from '../hooks/useProperties'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useSettings } from '../context/SettingsContext'
 import { classNames } from '../lib/format'
 import type { PropertyType } from '../types/property'
 
@@ -14,6 +15,7 @@ type DwellingFilter = 'all' | 'with' | 'without'
 
 export default function PropertiesPage() {
   const { t, lang } = useLanguage()
+  const { settings } = useSettings()
   const { properties, loading } = useProperties()
 
   const [search, setSearch] = useState('')
@@ -75,7 +77,7 @@ export default function PropertiesPage() {
           className="eyebrow flex items-center gap-3"
         >
           <span className="h-px w-8 bg-gold" />
-          {t.portfolio.eyebrow}
+          {lang === 'es' ? settings.portfolioEyebrowEs : settings.portfolioEyebrowEn}
         </motion.span>
         <motion.h1
           initial={{ opacity: 0, y: 24 }}
@@ -83,9 +85,11 @@ export default function PropertiesPage() {
           transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           className="mt-4 font-display text-5xl font-medium text-cream md:text-6xl"
         >
-          {t.portfolio.title}
+          {lang === 'es' ? settings.portfolioTitleEs : settings.portfolioTitleEn}
         </motion.h1>
-        <p className="mt-4 max-w-xl text-mist">{t.portfolio.subtitle}</p>
+        <p className="mt-4 max-w-xl text-mist">
+          {lang === 'es' ? settings.portfolioSubtitleEs : settings.portfolioSubtitleEn}
+        </p>
       </section>
 
       {/* Filter bar */}

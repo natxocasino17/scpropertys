@@ -23,7 +23,7 @@ export function Footer() {
           <div>
             <Logo />
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-mist">
-              {t.footer.tagline}
+              {lang === 'es' ? settings.footerTaglineEs : settings.footerTaglineEn}
             </p>
             <div className="mt-6 flex gap-3">
               {socials.map(({ url, Icon, label }) => (

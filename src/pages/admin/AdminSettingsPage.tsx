@@ -4,7 +4,7 @@ import { AdminLayout } from '../../components/admin/AdminLayout'
 import { Spinner } from '../../components/ui/Spinner'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { useSettings } from '../../context/SettingsContext'
-import { fetchSettings, saveSettings, SiteSettings, StatItem } from '../../lib/settings'
+import { fetchSettings, saveSettings, SiteSettings, StatItem, ServiceItem } from '../../lib/settings'
 import { uploadImage } from '../../lib/propertiesService'
 import { compressImage } from '../../lib/imageCompress'
 import { isSupabaseConfigured } from '../../lib/supabase'
@@ -58,6 +58,33 @@ export default function AdminSettingsPage() {
   const input =
     'w-full rounded-xl border border-white/15 bg-ink-800 px-4 py-2.5 text-sm text-cream placeholder:text-faint focus:border-gold focus:outline-none'
   const label = 'mb-1.5 block text-xs uppercase tracking-wide text-faint'
+
+  // Helper: a bilingual (ES + EN) field pair
+  const bi = (
+    caption: string,
+    esKey: keyof SiteSettings,
+    enKey: keyof SiteSettings,
+    multiline = false,
+  ) => (
+    <div className="grid gap-4 sm:grid-cols-2">
+      <div>
+        <label className={label}>{caption} (ES)</label>
+        {multiline ? (
+          <textarea rows={2} value={form[esKey] as string} onChange={(e) => set(esKey, e.target.value as never)} className={`${input} resize-none`} />
+        ) : (
+          <input value={form[esKey] as string} onChange={(e) => set(esKey, e.target.value as never)} className={input} />
+        )}
+      </div>
+      <div>
+        <label className={label}>{caption} (EN)</label>
+        {multiline ? (
+          <textarea rows={2} value={form[enKey] as string} onChange={(e) => set(enKey, e.target.value as never)} className={`${input} resize-none`} />
+        ) : (
+          <input value={form[enKey] as string} onChange={(e) => set(enKey, e.target.value as never)} className={input} />
+        )}
+      </div>
+    </div>
+  )
 
   return (
     <AdminLayout>
@@ -134,6 +161,67 @@ export default function AdminSettingsPage() {
               />
             ))}
           </div>
+        </Section>
+
+        {/* Featured section */}
+        <Section title={t.admin.featuredSection}>
+          <div className="space-y-4">
+            {bi(t.admin.eyebrowLabel, 'featuredEyebrowEs', 'featuredEyebrowEn')}
+            {bi(t.admin.titleLabel, 'featuredTitleEs', 'featuredTitleEn')}
+            {bi(t.admin.subtitleLabel, 'featuredSubtitleEs', 'featuredSubtitleEn')}
+            {bi(t.admin.linkLabel, 'featuredCtaEs', 'featuredCtaEn')}
+          </div>
+        </Section>
+
+        {/* Services section */}
+        <Section title={t.admin.servicesSection}>
+          <div className="space-y-4">
+            {bi(t.admin.eyebrowLabel, 'servicesEyebrowEs', 'servicesEyebrowEn')}
+            {bi(t.admin.titleLabel, 'servicesTitleEs', 'servicesTitleEn')}
+            <div className="space-y-4 pt-2">
+              {form.services.map((svc, i) => (
+                <ServiceEditor
+                  key={i}
+                  index={i}
+                  service={svc}
+                  onChange={(next) =>
+                    set('services', form.services.map((s, idx) => (idx === i ? next : s)))
+                  }
+                />
+              ))}
+            </div>
+          </div>
+        </Section>
+
+        {/* Final CTA section */}
+        <Section title={t.admin.ctaSection}>
+          <div className="space-y-4">
+            {bi(t.admin.eyebrowLabel, 'ctaEyebrowEs', 'ctaEyebrowEn')}
+            {bi(t.admin.titleLabel, 'ctaTitleEs', 'ctaTitleEn', true)}
+          </div>
+        </Section>
+
+        {/* Portfolio page header */}
+        <Section title={t.admin.portfolioSection}>
+          <div className="space-y-4">
+            {bi(t.admin.eyebrowLabel, 'portfolioEyebrowEs', 'portfolioEyebrowEn')}
+            {bi(t.admin.titleLabel, 'portfolioTitleEs', 'portfolioTitleEn')}
+            {bi(t.admin.subtitleLabel, 'portfolioSubtitleEs', 'portfolioSubtitleEn')}
+          </div>
+        </Section>
+
+        {/* Contact page header */}
+        <Section title={t.admin.contactHeaderSection}>
+          <div className="space-y-4">
+            {bi(t.admin.eyebrowLabel, 'contactEyebrowEs', 'contactEyebrowEn')}
+            {bi(t.admin.titleLabel, 'contactTitleEs', 'contactTitleEn')}
+            {bi(t.admin.subtitleLabel, 'contactSubtitleEs', 'contactSubtitleEn')}
+          </div>
+        </Section>
+
+        {/* Footer */}
+        <Section title="Footer">
+          {bi(t.admin.footerTagline, 'footerTaglineEs', 'footerTaglineEn')}
         </Section>
 
         {/* Contact */}
@@ -285,6 +373,69 @@ function StatEditor({
         <div>
           <label className={label}>{t.admin.statLabelEnLabel}</label>
           <input value={stat.labelEn} onChange={(e) => onChange({ ...stat, labelEn: e.target.value })} className={input} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ServiceEditor({
+  index,
+  service,
+  onChange,
+}: {
+  index: number
+  service: ServiceItem
+  onChange: (s: ServiceItem) => void
+}) {
+  const { t } = useLanguage()
+  const input =
+    'w-full rounded-xl border border-white/15 bg-ink-800 px-3 py-2 text-sm text-cream placeholder:text-faint focus:border-gold focus:outline-none'
+  const label = 'mb-1 block text-[10px] uppercase tracking-wide text-faint'
+  const iconKeys = Object.keys(STAT_ICONS)
+
+  return (
+    <div className="rounded-xl border border-white/10 bg-ink-800/60 p-4">
+      <div className="mb-3 text-xs font-medium text-gold">#{index + 1}</div>
+
+      <label className={label}>{t.admin.statIconLabel}</label>
+      <div className="mb-3 flex flex-wrap gap-2">
+        {iconKeys.map((key) => {
+          const active = service.icon === key
+          const Icon = STAT_ICONS[key]
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={() => onChange({ ...service, icon: key })}
+              title={key}
+              className={classNames(
+                'grid h-9 w-9 place-items-center rounded-lg border transition-all',
+                active ? 'border-gold bg-gold/15 text-gold' : 'border-white/12 text-cream/60 hover:border-white/30',
+              )}
+            >
+              {Icon ? <Icon size={16} strokeWidth={1.5} /> : null}
+            </button>
+          )
+        })}
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div>
+          <label className={label}>{t.admin.titleLabel} (ES)</label>
+          <input value={service.titleEs} onChange={(e) => onChange({ ...service, titleEs: e.target.value })} className={input} />
+        </div>
+        <div>
+          <label className={label}>{t.admin.titleLabel} (EN)</label>
+          <input value={service.titleEn} onChange={(e) => onChange({ ...service, titleEn: e.target.value })} className={input} />
+        </div>
+        <div>
+          <label className={label}>{t.admin.subtitleLabel} (ES)</label>
+          <textarea rows={2} value={service.descEs} onChange={(e) => onChange({ ...service, descEs: e.target.value })} className={`${input} resize-none`} />
+        </div>
+        <div>
+          <label className={label}>{t.admin.subtitleLabel} (EN)</label>
+          <textarea rows={2} value={service.descEn} onChange={(e) => onChange({ ...service, descEn: e.target.value })} className={`${input} resize-none`} />
         </div>
       </div>
     </div>
