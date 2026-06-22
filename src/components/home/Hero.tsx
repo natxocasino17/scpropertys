@@ -6,9 +6,13 @@ import { useLanguage } from '../../i18n/LanguageContext'
 import { useSettings } from '../../context/SettingsContext'
 
 export function Hero() {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   const { settings } = useSettings()
   const HERO_IMG = settings.heroImage
+  const heroEyebrow = (lang === 'es' ? settings.heroEyebrowEs : settings.heroEyebrowEn) || t.hero.eyebrow
+  const heroTitle = (lang === 'es' ? settings.heroTitleEs : settings.heroTitleEn) || t.hero.title
+  const heroSubtitle =
+    (lang === 'es' ? settings.heroSubtitleEs : settings.heroSubtitleEn) || t.hero.subtitle
   const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '22%'])
@@ -41,11 +45,11 @@ export function Hero() {
           className="eyebrow mb-6 flex items-center gap-3"
         >
           <span className="h-px w-10 bg-gold" />
-          {t.hero.eyebrow}
+          {heroEyebrow}
         </motion.span>
 
         <h1 className="max-w-4xl font-display text-5xl font-medium leading-[1.05] text-cream sm:text-6xl md:text-7xl lg:text-[5.5rem]">
-          {t.hero.title.split(' ').map((word, i) => (
+          {heroTitle.split(' ').map((word, i) => (
             <motion.span
               key={i}
               initial={{ opacity: 0, y: 40 }}
@@ -64,7 +68,7 @@ export function Hero() {
           transition={{ duration: 0.9, delay: 0.9, ease: [0.22, 1, 0.36, 1] }}
           className="mt-7 max-w-xl text-base leading-relaxed text-cream/75 md:text-lg"
         >
-          {t.hero.subtitle}
+          {heroSubtitle}
         </motion.p>
 
         <motion.div

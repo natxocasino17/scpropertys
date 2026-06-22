@@ -1,13 +1,15 @@
 import { useEffect, useState, useRef } from 'react'
-import { Save, Loader2, Check, Upload, Link2, Image as ImageIcon } from 'lucide-react'
+import { Save, Loader2, Check, Upload, Link2, Image as ImageIcon, Star } from 'lucide-react'
 import { AdminLayout } from '../../components/admin/AdminLayout'
 import { Spinner } from '../../components/ui/Spinner'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { useSettings } from '../../context/SettingsContext'
-import { fetchSettings, saveSettings, SiteSettings } from '../../lib/settings'
+import { fetchSettings, saveSettings, SiteSettings, StatItem } from '../../lib/settings'
 import { uploadImage } from '../../lib/propertiesService'
 import { compressImage } from '../../lib/imageCompress'
 import { isSupabaseConfigured } from '../../lib/supabase'
+import { STAT_ICONS, STAT_ICON_KEYS } from '../../lib/statIcons'
+import { classNames } from '../../lib/format'
 
 export default function AdminSettingsPage() {
   const { t } = useLanguage()
@@ -80,6 +82,58 @@ export default function AdminSettingsPage() {
         <Section title={t.admin.heroSection}>
           <label className={label}>{t.admin.heroImage}</label>
           <SingleImageInput value={form.heroImage} onChange={(v) => set('heroImage', v)} placeholder={t.admin.imgUrlPlaceholder} />
+        </Section>
+
+        {/* Home texts */}
+        <Section title={t.admin.homeSection}>
+          <div className="grid gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className={label}>{t.admin.heroEyebrowLabel} (ES)</label>
+                <input value={form.heroEyebrowEs} onChange={(e) => set('heroEyebrowEs', e.target.value)} className={input} />
+              </div>
+              <div>
+                <label className={label}>{t.admin.heroEyebrowLabel} (EN)</label>
+                <input value={form.heroEyebrowEn} onChange={(e) => set('heroEyebrowEn', e.target.value)} className={input} />
+              </div>
+              <div>
+                <label className={label}>{t.admin.heroTitleLabel} (ES)</label>
+                <input value={form.heroTitleEs} onChange={(e) => set('heroTitleEs', e.target.value)} className={input} />
+              </div>
+              <div>
+                <label className={label}>{t.admin.heroTitleLabel} (EN)</label>
+                <input value={form.heroTitleEn} onChange={(e) => set('heroTitleEn', e.target.value)} className={input} />
+              </div>
+              <div>
+                <label className={label}>{t.admin.heroSubtitleLabel} (ES)</label>
+                <textarea rows={3} value={form.heroSubtitleEs} onChange={(e) => set('heroSubtitleEs', e.target.value)} className={`${input} resize-none`} />
+              </div>
+              <div>
+                <label className={label}>{t.admin.heroSubtitleLabel} (EN)</label>
+                <textarea rows={3} value={form.heroSubtitleEn} onChange={(e) => set('heroSubtitleEn', e.target.value)} className={`${input} resize-none`} />
+              </div>
+            </div>
+          </div>
+        </Section>
+
+        {/* Stats editor */}
+        <Section title={t.admin.statsSection}>
+          <p className="mb-4 text-xs text-faint">{t.admin.statsHint}</p>
+          <div className="space-y-4">
+            {form.stats.map((stat, i) => (
+              <StatEditor
+                key={i}
+                index={i}
+                stat={stat}
+                onChange={(next) =>
+                  set(
+                    'stats',
+                    form.stats.map((s, idx) => (idx === i ? next : s)),
+                  )
+                }
+              />
+            ))}
+          </div>
         </Section>
 
         {/* Contact */}
@@ -170,6 +224,70 @@ function Section({ title, children }: { title: string; children: React.ReactNode
       <h2 className="mb-5 font-display text-xl text-cream">{title}</h2>
       {children}
     </section>
+  )
+}
+
+function StatEditor({
+  index,
+  stat,
+  onChange,
+}: {
+  index: number
+  stat: StatItem
+  onChange: (s: StatItem) => void
+}) {
+  const { t } = useLanguage()
+  const input =
+    'w-full rounded-xl border border-white/15 bg-ink-800 px-3 py-2 text-sm text-cream placeholder:text-faint focus:border-gold focus:outline-none'
+  const label = 'mb-1 block text-[10px] uppercase tracking-wide text-faint'
+
+  return (
+    <div className="rounded-xl border border-white/10 bg-ink-800/60 p-4">
+      <div className="mb-3 text-xs font-medium text-gold">#{index + 1}</div>
+
+      {/* Icon picker */}
+      <label className={label}>{t.admin.statIconLabel}</label>
+      <div className="mb-3 flex flex-wrap gap-2">
+        {STAT_ICON_KEYS.map((key) => {
+          const active = stat.icon === key
+          const Icon = STAT_ICONS[key]
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={() => onChange({ ...stat, icon: key })}
+              title={key}
+              className={classNames(
+                'grid h-9 w-9 place-items-center rounded-lg border transition-all',
+                active ? 'border-gold bg-gold/15 text-gold' : 'border-white/12 text-cream/60 hover:border-white/30',
+              )}
+            >
+              {key === 'stars' ? <Star size={16} className="fill-current" /> : Icon ? <Icon size={16} strokeWidth={1.5} /> : null}
+            </button>
+          )
+        })}
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div>
+          <label className={label}>{t.admin.statValueLabel}</label>
+          <input
+            value={stat.value}
+            onChange={(e) => onChange({ ...stat, value: e.target.value })}
+            placeholder="3+, 100%, {count}…"
+            className={input}
+          />
+        </div>
+        <div>
+          <label className={label}>{t.admin.statLabelEsLabel}</label>
+          <input value={stat.labelEs} onChange={(e) => onChange({ ...stat, labelEs: e.target.value })} className={input} />
+        </div>
+        <div>
+          <label className={label}>{t.admin.statLabelEnLabel}</label>
+          <input value={stat.labelEn} onChange={(e) => onChange({ ...stat, labelEn: e.target.value })} className={input} />
+        </div>
+      </div>
+    </div>
   )
 }
 

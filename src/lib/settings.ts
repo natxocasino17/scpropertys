@@ -1,11 +1,28 @@
 import { getSupabase, TABLES, isSupabaseConfigured } from './supabase'
 import { siteConfig } from '../config/siteConfig'
+import { translations } from '../i18n/translations'
+
+export interface StatItem {
+  icon: string // key from STAT_ICONS, or 'stars' for a 5-star rating
+  value: string // e.g. "3+", "100%", "★★★★★", or "{count}" for the live count
+  labelEs: string
+  labelEn: string
+}
 
 export interface SiteSettings {
   brand: string
   brandSuffix: string
   taglineEs: string
   taglineEn: string
+  // Home hero
+  heroEyebrowEs: string
+  heroEyebrowEn: string
+  heroTitleEs: string
+  heroTitleEn: string
+  heroSubtitleEs: string
+  heroSubtitleEn: string
+  // Home stats strip
+  stats: StatItem[]
   whatsapp: string
   phoneDisplay: string
   email: string
@@ -24,12 +41,29 @@ export interface SiteSettings {
 export const DEFAULT_HERO =
   'https://images.unsplash.com/photo-1602343168117-bb8ffe3e2e9f?auto=format&fit=crop&w=2400&q=85'
 
-/** Defaults come from siteConfig — the DB overrides them when present. */
+const es = translations.es
+const en = translations.en
+
+export const DEFAULT_STATS: StatItem[] = [
+  { icon: 'home', value: '{count}', labelEs: es.stats.properties, labelEn: en.stats.properties },
+  { icon: 'pin', value: '5', labelEs: es.stats.zones, labelEn: en.stats.zones },
+  { icon: 'handshake', value: '100%', labelEs: es.stats.experience, labelEn: en.stats.experience },
+  { icon: 'stars', value: '★★★★★', labelEs: es.stats.satisfaction, labelEn: en.stats.satisfaction },
+]
+
+/** Defaults come from siteConfig / translations — the DB overrides them when present. */
 export const defaultSettings: SiteSettings = {
   brand: siteConfig.brand,
   brandSuffix: siteConfig.brandSuffix,
   taglineEs: siteConfig.tagline.es,
   taglineEn: siteConfig.tagline.en,
+  heroEyebrowEs: es.hero.eyebrow,
+  heroEyebrowEn: en.hero.eyebrow,
+  heroTitleEs: es.hero.title,
+  heroTitleEn: en.hero.title,
+  heroSubtitleEs: es.hero.subtitle,
+  heroSubtitleEn: en.hero.subtitle,
+  stats: DEFAULT_STATS,
   whatsapp: siteConfig.contact.whatsapp,
   phoneDisplay: siteConfig.contact.phoneDisplay,
   email: siteConfig.contact.email,
