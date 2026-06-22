@@ -1,0 +1,307 @@
+import { useEffect, useState } from 'react'
+import { useParams, Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import {
+  ArrowLeft,
+  MapPin,
+  BedDouble,
+  Bath,
+  Maximize,
+  Ruler,
+  Home as HomeIcon,
+  Share2,
+  Check,
+  Play,
+} from 'lucide-react'
+import { PublicLayout } from '../components/layout/PublicLayout'
+import { Gallery } from '../components/property/Gallery'
+import { LazyMap } from '../components/property/LazyMap'
+import { StatusBadge } from '../components/property/StatusBadge'
+import { PropertyCard } from '../components/property/PropertyCard'
+import { Spinner } from '../components/ui/Spinner'
+import { Reveal } from '../components/ui/Reveal'
+import { useLanguage } from '../i18n/LanguageContext'
+import { useProperties } from '../hooks/useProperties'
+import { fetchPropertyBySlug } from '../lib/propertiesService'
+import { formatPrice, formatArea, whatsappLink } from '../lib/format'
+import { amenityIcon, typeIcon } from '../lib/amenityIcons'
+import type { Property } from '../types/property'
+
+export default function PropertyDetailPage() {
+  const { slug } = useParams<{ slug: string }>()
+  const { t, lang } = useLanguage()
+  const { properties } = useProperties()
+  const [property, setProperty] = useState<Property | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    let active = true
+    setLoading(true)
+    fetchPropertyBySlug(slug ?? '')
+      .then((p) => active && setProperty(p))
+      .finally(() => active && setLoading(false))
+    return () => {
+      active = false
+    }
+  }, [slug])
+
+  if (loading) {
+    return (
+      <PublicLayout>
+        <div className="pt-32">
+          <Spinner />
+        </div>
+      </PublicLayout>
+    )
+  }
+
+  if (!property) {
+    return (
+      <PublicLayout>
+        <div className="container-luxe flex min-h-[60vh] flex-col items-center justify-center pt-32 text-center">
+          <h1 className="font-display text-4xl text-cream">{t.detail.notFound}</h1>
+          <p className="mt-3 text-mist">{t.detail.notFoundDesc}</p>
+          <Link to="/propiedades" className="btn-gold mt-8">
+            {t.detail.back}
+          </Link>
+        </div>
+      </PublicLayout>
+    )
+  }
+
+  const title = lang === 'es' ? property.title_es : property.title_en
+  const description = lang === 'es' ? property.description_es : property.description_en
+  const TypeIcon = typeIcon[property.type]
+
+  const specs = [
+    property.has_dwelling && property.bedrooms > 0
+      ? { Icon: BedDouble, label: t.detail.bedrooms, value: String(property.bedrooms) }
+      : null,
+    property.has_dwelling && property.bathrooms > 0
+      ? { Icon: Bath, label: t.detail.bathrooms, value: String(property.bathrooms) }
+      : null,
+    { Icon: Maximize, label: t.detail.land, value: formatArea(property.land_size) },
+    property.construction_size > 0
+      ? { Icon: Ruler, label: t.detail.construction, value: formatArea(property.construction_size) }
+      : null,
+    { Icon: TypeIcon, label: t.detail.type, value: t.types[property.type] },
+  ].filter(Boolean) as { Icon: typeof BedDouble; label: string; value: string }[]
+
+  const waMessage = t.contact.prefill + title
+  const similar = properties
+    .filter((p) => p.id !== property.id && (p.zone === property.zone || p.type === property.type))
+    .slice(0, 3)
+
+  function share() {
+    const url = window.location.href
+    if (navigator.share) {
+      navigator.share({ title, url }).catch(() => {})
+    } else {
+      navigator.clipboard.writeText(url)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+  function videoEmbed(url: string): string | null {
+    const yt = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]+)/)
+    if (yt) return `https://www.youtube.com/embed/${yt[1]}`
+    const vimeo = url.match(/vimeo\.com\/(\d+)/)
+    if (vimeo) return `https://player.vimeo.com/video/${vimeo[1]}`
+    return null
+  }
+  const embed = property.video_url ? videoEmbed(property.video_url) : null
+
+  return (
+    <PublicLayout>
+      <div className="container-luxe pt-28 md:pt-32">
+        <Link
+          to="/propiedades"
+          className="group inline-flex items-center gap-2 text-sm text-mist transition-colors hover:text-gold"
+        >
+          <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
+          {t.detail.back}
+        </Link>
+
+        {/* Title row */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          className="mt-6 flex flex-wrap items-end justify-between gap-6"
+        >
+          <div>
+            <div className="flex items-center gap-3">
+              <StatusBadge status={property.status} />
+              <span className="flex items-center gap-1.5 text-sm text-gold">
+                <MapPin size={15} /> {property.zone}
+              </span>
+            </div>
+            <h1 className="mt-4 max-w-3xl font-display text-4xl font-medium leading-tight text-cream md:text-6xl">
+              {title}
+            </h1>
+          </div>
+          <div className="text-left md:text-right">
+            <span className="font-display text-4xl text-gilt md:text-5xl">
+              {property.price > 0 ? formatPrice(property.price) : t.detail.priceOnRequest}
+            </span>
+            <button
+              onClick={share}
+              className="ml-4 mt-2 inline-flex items-center gap-2 text-xs text-mist transition-colors hover:text-gold md:ml-0 md:flex md:justify-end"
+            >
+              {copied ? <Check size={14} /> : <Share2 size={14} />}
+              {t.detail.share}
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Gallery */}
+        <div className="mt-8">
+          <Gallery images={property.images} title={title} />
+        </div>
+
+        {/* Body grid */}
+        <div className="mt-14 grid gap-12 lg:grid-cols-[1.6fr_1fr]">
+          {/* Left column */}
+          <div className="space-y-12">
+            {/* Specs */}
+            <Reveal>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
+                {specs.map((s, i) => (
+                  <div
+                    key={i}
+                    className="rounded-2xl border border-white/10 bg-ink-800 p-5 text-center"
+                  >
+                    <s.Icon size={22} className="mx-auto text-gold" strokeWidth={1.5} />
+                    <div className="mt-3 font-display text-xl text-cream">{s.value}</div>
+                    <div className="mt-1 text-[11px] uppercase tracking-wide text-faint">
+                      {s.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+
+            {/* Overview */}
+            <Reveal>
+              <h2 className="font-display text-3xl text-cream">{t.detail.overview}</h2>
+              <div className="divider-gold mt-4 !mx-0" />
+              <p className="mt-6 whitespace-pre-line text-base leading-relaxed text-mist">
+                {description}
+              </p>
+            </Reveal>
+
+            {/* Amenities */}
+            {property.amenities.length > 0 && (
+              <Reveal>
+                <h2 className="font-display text-3xl text-cream">{t.detail.amenities}</h2>
+                <div className="divider-gold mt-4 !mx-0" />
+                <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
+                  {property.amenities.map((a) => {
+                    const Icon = amenityIcon[a]
+                    return (
+                      <div
+                        key={a}
+                        className="flex items-center gap-3 rounded-xl border border-white/10 bg-ink-800 px-4 py-3"
+                      >
+                        <Icon size={18} className="shrink-0 text-gold" strokeWidth={1.5} />
+                        <span className="text-sm text-cream/85">{t.amenities[a]}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </Reveal>
+            )}
+
+            {/* Video */}
+            {embed && (
+              <Reveal>
+                <h2 className="flex items-center gap-2 font-display text-3xl text-cream">
+                  <Play size={22} className="text-gold" /> {t.detail.video}
+                </h2>
+                <div className="divider-gold mt-4 !mx-0" />
+                <div className="mt-6 aspect-video overflow-hidden rounded-2xl border border-white/10">
+                  <iframe
+                    src={embed}
+                    title={title}
+                    className="h-full w-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              </Reveal>
+            )}
+
+            {/* Map */}
+            {property.lat != null && property.lng != null && (
+              <Reveal>
+                <h2 className="flex items-center gap-2 font-display text-3xl text-cream">
+                  <MapPin size={22} className="text-gold" /> {t.detail.location}
+                </h2>
+                <div className="divider-gold mt-4 !mx-0" />
+                <LazyMap
+                  lat={property.lat}
+                  lng={property.lng}
+                  label={title}
+                  className="mt-6 h-80"
+                />
+              </Reveal>
+            )}
+          </div>
+
+          {/* Right column — sticky enquiry card */}
+          <div className="lg:relative">
+            <div className="lg:sticky lg:top-28">
+              <Reveal>
+                <div className="glass rounded-3xl p-7">
+                  <div className="flex items-center gap-3">
+                    <span className="grid h-12 w-12 place-items-center rounded-full border border-gold/40 text-gold">
+                      <HomeIcon size={20} strokeWidth={1.5} />
+                    </span>
+                    <div>
+                      <div className="text-xs uppercase tracking-wide text-faint">
+                        {t.common.from}
+                      </div>
+                      <div className="font-display text-2xl text-cream">
+                        {property.price > 0 ? formatPrice(property.price) : t.detail.priceOnRequest}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="my-6 h-px bg-white/10" />
+
+                  <p className="text-sm leading-relaxed text-mist">{t.detail.enquire}</p>
+
+                  <a
+                    href={whatsappLink(waMessage)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-gold mt-5 w-full"
+                  >
+                    {t.detail.whatsapp}
+                  </a>
+                  <Link to="/contacto" className="btn-ghost mt-3 w-full">
+                    {t.contact.title}
+                  </Link>
+                </div>
+              </Reveal>
+            </div>
+          </div>
+        </div>
+
+        {/* Similar */}
+        {similar.length > 0 && (
+          <section className="mt-24">
+            <h2 className="font-display text-3xl text-cream md:text-4xl">{t.detail.similar}</h2>
+            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {similar.map((p, i) => (
+                <PropertyCard key={p.id} property={p} index={i} />
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+    </PublicLayout>
+  )
+}

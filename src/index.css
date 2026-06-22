@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ───────────────────────────────────────────────
+   Azur Caribe Design System — base layer
+─────────────────────────────────────────────── */
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-ink text-cream font-sans antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: rgba(200, 164, 93, 0.28);
+    color: #fff;
+  }
+
+  /* Custom luxury scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0a0a0b;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2a2a30;
+    border-radius: 999px;
+    border: 2px solid #0a0a0b;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3a3a42;
+  }
+}
+
+@layer components {
+  .container-luxe {
+    @apply mx-auto w-full max-w-container px-5 sm:px-8 lg:px-12;
+  }
+
+  /* Small uppercase tracked label, the luxury "eyebrow" */
+  .eyebrow {
+    @apply font-sans text-[11px] uppercase tracking-luxe text-gold/90;
+  }
+
+  /* Gold gradient text */
+  .text-gilt {
+    @apply bg-gradient-to-r from-gold-light via-gold to-gold-deep bg-clip-text text-transparent;
+  }
+
+  /* Glass panel */
+  .glass {
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .hairline {
+    @apply border-white/10;
+  }
+
+  /* Primary gold button */
+  .btn-gold {
+    @apply relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full
+      bg-gold px-7 py-3 text-sm font-medium tracking-wide text-ink
+      transition-all duration-500 ease-luxe hover:bg-gold-light
+      hover:shadow-[0_10px_40px_-12px_rgba(200,164,93,0.6)];
+  }
+
+  /* Ghost / outline button */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-white/20
+      px-7 py-3 text-sm font-medium tracking-wide text-cream
+      transition-all duration-500 ease-luxe hover:border-gold hover:text-gold;
+  }
+
+  /* Animated gold underline on nav links */
+  .nav-link {
+    @apply relative text-sm tracking-wide text-cream/80 transition-colors duration-300 hover:text-cream;
+  }
+  .nav-link::after {
+    content: '';
+    @apply absolute -bottom-1 left-0 h-px w-0 bg-gold transition-all duration-500 ease-luxe;
+  }
+  .nav-link:hover::after,
+  .nav-link.active::after {
+    @apply w-full;
+  }
+
+  /* Thin divider with gold center */
+  .divider-gold {
+    @apply mx-auto h-px w-24 bg-gradient-to-r from-transparent via-gold to-transparent;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  }
+}
+
+/* Leaflet dark theme tweaks */
+.leaflet-container {
+  background: #0f0f12 !important;
+  font-family: 'Inter', sans-serif;
+}
+.leaflet-tile {
+  filter: grayscale(0.4) brightness(0.78) contrast(1.05);
+}
+.leaflet-control-attribution {
+  background: rgba(10, 10, 11, 0.7) !important;
+  color: #6e6c66 !important;
+}
+.leaflet-control-attribution a {
+  color: #8a8780 !important;
+}
+.leaflet-bar a {
+  background: #16161a !important;
+  color: #c8a45d !important;
+  border-color: #2a2a30 !important;
+}
