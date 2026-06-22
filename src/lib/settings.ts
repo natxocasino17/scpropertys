@@ -51,6 +51,13 @@ export interface SiteSettings {
   ctaEyebrowEn: string
   ctaTitleEs: string
   ctaTitleEn: string
+  ctaSubtitleEs: string
+  ctaSubtitleEn: string
+  ctaButton1Es: string
+  ctaButton1En: string
+  ctaButton2Es: string
+  ctaButton2En: string
+  ctaImage: string
   // Portfolio page header
   portfolioEyebrowEs: string
   portfolioEyebrowEn: string
@@ -133,6 +140,14 @@ export const defaultSettings: SiteSettings = {
   ctaEyebrowEn: en.contact.eyebrow,
   ctaTitleEs: es.contact.subtitle,
   ctaTitleEn: en.contact.subtitle,
+  ctaSubtitleEs: '',
+  ctaSubtitleEn: '',
+  ctaButton1Es: es.nav.enquire,
+  ctaButton1En: en.nav.enquire,
+  ctaButton2Es: es.hero.cta,
+  ctaButton2En: en.hero.cta,
+  ctaImage:
+    'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2400&q=80',
   portfolioEyebrowEs: es.portfolio.eyebrow,
   portfolioEyebrowEn: en.portfolio.eyebrow,
   portfolioTitleEs: es.portfolio.title,

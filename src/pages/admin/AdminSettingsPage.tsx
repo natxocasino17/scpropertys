@@ -196,8 +196,15 @@ export default function AdminSettingsPage() {
         {/* Final CTA section */}
         <Section title={t.admin.ctaSection}>
           <div className="space-y-4">
+            <div>
+              <label className={label}>{t.admin.heroImage}</label>
+              <SingleImageInput value={form.ctaImage} onChange={(v) => set('ctaImage', v)} placeholder={t.admin.imgUrlPlaceholder} />
+            </div>
             {bi(t.admin.eyebrowLabel, 'ctaEyebrowEs', 'ctaEyebrowEn')}
             {bi(t.admin.titleLabel, 'ctaTitleEs', 'ctaTitleEn', true)}
+            {bi(t.admin.subtitleLabel, 'ctaSubtitleEs', 'ctaSubtitleEn', true)}
+            {bi(`${t.admin.linkLabel} 1`, 'ctaButton1Es', 'ctaButton1En')}
+            {bi(`${t.admin.linkLabel} 2`, 'ctaButton2Es', 'ctaButton2En')}
           </div>
         </Section>
 

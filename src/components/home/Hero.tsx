@@ -30,19 +30,19 @@ export function Hero() {
           fetchPriority="high"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-ink/70 via-ink/40 to-ink" />
-        <div className="absolute inset-0 bg-gradient-to-r from-ink/80 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-ink/40 via-transparent to-transparent" />
       </motion.div>
 
       {/* Content */}
       <motion.div
         style={{ opacity }}
-        className="container-luxe relative z-10 flex h-full flex-col justify-center"
+        className="container-luxe relative z-10 flex h-full flex-col items-center justify-center text-center"
       >
         <motion.span
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="eyebrow mb-6 flex items-center gap-3"
+          className="eyebrow mb-6 flex items-center justify-center gap-3"
         >
           <span className="h-px w-10 bg-gold" />
           {heroEyebrow}
@@ -75,7 +75,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 1.05, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-10 flex flex-wrap items-center gap-4"
+          className="mt-10 flex flex-wrap items-center justify-center gap-4"
         >
           <Link to="/propiedades" className="btn-gold">
             {t.hero.cta}
