@@ -146,13 +146,6 @@ export default function PropertyDetailPage() {
             <span className="font-display text-4xl text-gilt md:text-5xl">
               {property.price > 0 ? formatPrice(property.price) : t.detail.priceOnRequest}
             </span>
-            <button
-              onClick={share}
-              className="ml-4 mt-2 inline-flex items-center gap-2 text-xs text-mist transition-colors hover:text-gold md:ml-0 md:flex md:justify-end"
-            >
-              {copied ? <Check size={14} /> : <Share2 size={14} />}
-              {t.detail.share}
-            </button>
           </div>
         </motion.div>
 
@@ -301,6 +294,18 @@ export default function PropertyDetailPage() {
             </div>
           </section>
         )}
+
+        {/* Share — bottom of the page, near the footer / socials */}
+        <div className="mt-20 flex flex-col items-center gap-4 border-t border-white/10 pt-10 text-center">
+          <span className="eyebrow">{t.detail.share}</span>
+          <button
+            onClick={share}
+            className="inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-sm text-cream transition-all duration-500 ease-luxe hover:border-gold hover:text-gold"
+          >
+            {copied ? <Check size={16} /> : <Share2 size={16} />}
+            {t.detail.share}
+          </button>
+        </div>
       </div>
     </PublicLayout>
   )
