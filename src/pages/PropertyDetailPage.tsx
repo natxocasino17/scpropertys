@@ -24,6 +24,7 @@ import { useLanguage } from '../i18n/LanguageContext'
 import { useProperties } from '../hooks/useProperties'
 import { fetchPropertyBySlug } from '../lib/propertiesService'
 import { formatPrice, formatArea, whatsappLink } from '../lib/format'
+import { parseVideo } from '../lib/video'
 import { amenityIcon, typeIcon } from '../lib/amenityIcons'
 import type { Property } from '../types/property'
 
@@ -104,14 +105,7 @@ export default function PropertyDetailPage() {
     }
   }
 
-  function videoEmbed(url: string): string | null {
-    const yt = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]+)/)
-    if (yt) return `https://www.youtube.com/embed/${yt[1]}`
-    const vimeo = url.match(/vimeo\.com\/(\d+)/)
-    if (vimeo) return `https://player.vimeo.com/video/${vimeo[1]}`
-    return null
-  }
-  const embed = property.video_url ? videoEmbed(property.video_url) : null
+  const video = parseVideo(property.video_url)
 
   return (
     <PublicLayout>
@@ -208,20 +202,26 @@ export default function PropertyDetailPage() {
             )}
 
             {/* Video */}
-            {embed && (
+            {video && (
               <Reveal>
                 <h2 className="flex items-center gap-2 font-display text-3xl text-cream">
                   <Play size={22} className="text-gold" /> {t.detail.video}
                 </h2>
                 <div className="divider-gold mt-4 !mx-0" />
-                <div className="mt-6 aspect-video overflow-hidden rounded-2xl border border-white/10">
-                  <iframe
-                    src={embed}
-                    title={title}
-                    className="h-full w-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
+                <div className="mt-6 aspect-video overflow-hidden rounded-2xl border border-white/10 bg-ink-800">
+                  {video.kind === 'iframe' ? (
+                    <iframe
+                      src={video.src}
+                      title={title}
+                      className="h-full w-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <video src={video.src} controls playsInline className="h-full w-full object-cover">
+                      {title}
+                    </video>
+                  )}
                 </div>
               </Reveal>
             )}

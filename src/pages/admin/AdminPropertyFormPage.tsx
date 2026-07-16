@@ -7,12 +7,13 @@ import { Spinner } from '../../components/ui/Spinner'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { useSettings } from '../../context/SettingsContext'
 import { addZone } from '../../lib/settings'
-import { Plus, Check as CheckIcon, X as XIcon } from 'lucide-react'
+import { Plus, Check as CheckIcon, X as XIcon, Link2 } from 'lucide-react'
 import {
   adminFetchPropertyById,
   createProperty,
   updateProperty,
 } from '../../lib/propertiesService'
+import { parseVideo } from '../../lib/video'
 import { slugify, classNames } from '../../lib/format'
 import type {
   PropertyInput,
@@ -342,13 +343,8 @@ export default function AdminPropertyFormPage() {
         <Section title={`${t.detail.video} · ${t.detail.location}`}>
           <div className="grid gap-4 md:grid-cols-3">
             <div className="md:col-span-3">
-              <label className={label}>{t.detail.video} (YouTube / Vimeo URL)</label>
-              <input
-                value={form.video_url ?? ''}
-                onChange={(e) => set('video_url', e.target.value)}
-                placeholder="https://youtube.com/watch?v=…"
-                className={input}
-              />
+              <label className={label}>{t.detail.video}</label>
+              <VideoInput value={form.video_url ?? ''} onChange={(v) => set('video_url', v)} />
             </div>
             <div>
               <label className={label}>Latitud</label>
@@ -478,6 +474,38 @@ function ZonePicker({ value, onChange }: { value: string; onChange: (v: string) 
       >
         <Plus size={15} /> {t.admin.newZone}
       </button>
+    </div>
+  )
+}
+
+function VideoInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const { t } = useLanguage()
+  const parsed = parseVideo(value)
+  const input =
+    'w-full rounded-xl border border-white/15 bg-ink-800 py-2.5 pl-9 pr-3 text-sm text-cream placeholder:text-faint focus:border-gold focus:outline-none'
+
+  return (
+    <div>
+      <div className="relative">
+        <Link2 size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-faint" />
+        <input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="https://youtube.com/watch?v=…  ó  https://youtu.be/…"
+          className={input}
+        />
+      </div>
+      <p className="mt-2 text-xs text-faint">{t.detail.videoHint}</p>
+
+      {value && !parsed && (
+        <p className="mt-2 text-xs text-rose-300">{t.detail.videoInvalid}</p>
+      )}
+
+      {parsed?.kind === 'iframe' && (
+        <div className="mt-3 aspect-video max-w-md overflow-hidden rounded-xl border border-white/10 bg-ink-700">
+          <iframe src={parsed.src} title="preview" className="h-full w-full" allowFullScreen />
+        </div>
+      )}
     </div>
   )
 }
