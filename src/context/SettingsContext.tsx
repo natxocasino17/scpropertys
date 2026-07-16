@@ -1,9 +1,10 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react'
 import {
   SiteSettings,
-  defaultSettings,
   fetchSettings,
   setActiveSettings,
+  loadCachedSettings,
+  cacheSettings,
 } from '../lib/settings'
 
 interface SettingsContextValue {
@@ -15,13 +16,20 @@ interface SettingsContextValue {
 const SettingsContext = createContext<SettingsContextValue | null>(null)
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
-  const [settings, setSettings] = useState<SiteSettings>(defaultSettings)
+  // Start from the locally cached settings so the correct hero image / brand
+  // paint immediately on load (no flash of the default before the real one).
+  const [settings, setSettings] = useState<SiteSettings>(() => {
+    const cached = loadCachedSettings()
+    setActiveSettings(cached)
+    return cached
+  })
   const [loading, setLoading] = useState(true)
 
   const reload = useCallback(async () => {
     const s = await fetchSettings()
     setSettings(s)
     setActiveSettings(s)
+    cacheSettings(s)
   }, [])
 
   useEffect(() => {

@@ -199,6 +199,27 @@ export function setActiveSettings(s: SiteSettings) {
   active = s
 }
 
+// ── Local cache: avoids the "old image flashes before the real one" on load ──
+const CACHE_KEY = 'sc_settings_cache'
+
+export function loadCachedSettings(): SiteSettings {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY)
+    if (raw) return { ...defaultSettings, ...(JSON.parse(raw) as Partial<SiteSettings>) }
+  } catch {
+    /* ignore */
+  }
+  return { ...defaultSettings }
+}
+
+export function cacheSettings(s: SiteSettings) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(s))
+  } catch {
+    /* ignore */
+  }
+}
+
 const SETTINGS_ID = 'main'
 
 export async function fetchSettings(): Promise<SiteSettings> {
