@@ -148,6 +148,31 @@ export default function PropertyDetailPage() {
           <Gallery images={property.images} title={title} />
         </div>
 
+        {/* Video — right after the photos */}
+        {video && (
+          <Reveal className="mt-12">
+            <h2 className="flex items-center gap-2 font-display text-3xl text-cream">
+              <Play size={22} className="text-gold" /> {t.detail.video}
+            </h2>
+            <div className="divider-gold mt-4 !mx-0" />
+            <div className="mt-6 aspect-video overflow-hidden rounded-2xl border border-white/10 bg-ink-800">
+              {video.kind === 'iframe' ? (
+                <iframe
+                  src={video.src}
+                  title={title}
+                  className="h-full w-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <video src={video.src} controls playsInline className="h-full w-full object-cover">
+                  {title}
+                </video>
+              )}
+            </div>
+          </Reveal>
+        )}
+
         {/* Body grid */}
         <div className="mt-14 grid gap-12 lg:grid-cols-[1.6fr_1fr]">
           {/* Left column */}
@@ -197,31 +222,6 @@ export default function PropertyDetailPage() {
                       </div>
                     )
                   })}
-                </div>
-              </Reveal>
-            )}
-
-            {/* Video */}
-            {video && (
-              <Reveal>
-                <h2 className="flex items-center gap-2 font-display text-3xl text-cream">
-                  <Play size={22} className="text-gold" /> {t.detail.video}
-                </h2>
-                <div className="divider-gold mt-4 !mx-0" />
-                <div className="mt-6 aspect-video overflow-hidden rounded-2xl border border-white/10 bg-ink-800">
-                  {video.kind === 'iframe' ? (
-                    <iframe
-                      src={video.src}
-                      title={title}
-                      className="h-full w-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  ) : (
-                    <video src={video.src} controls playsInline className="h-full w-full object-cover">
-                      {title}
-                    </video>
-                  )}
                 </div>
               </Reveal>
             )}
