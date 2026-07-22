@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Instagram, User, Mail, MessageCircle } from 'lucide-react'
+import { Instagram, User, Mail, MessageCircle, Facebook, Music2 } from 'lucide-react'
 import { PublicLayout } from '../components/layout/PublicLayout'
 import { Reveal } from '../components/ui/Reveal'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -112,23 +112,47 @@ function AgentBlock({
           {agent.phoneDisplay && <span className="opacity-80">· {agent.phoneDisplay}</span>}
         </a>
 
-        <div className="flex gap-2.5">
+        <div className="flex flex-wrap justify-center gap-2.5">
           {agent.instagram && (
             <a
               href={agent.instagram}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex flex-1 items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-2.5 text-sm text-cream/85 transition-all hover:border-gold hover:text-gold"
+              aria-label="Instagram"
+              className="grid h-11 w-11 place-items-center rounded-full border border-white/20 text-cream/85 transition-all hover:border-gold hover:text-gold"
             >
-              <Instagram size={16} /> Instagram
+              <Instagram size={18} />
+            </a>
+          )}
+          {agent.facebook && (
+            <a
+              href={agent.facebook}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+              className="grid h-11 w-11 place-items-center rounded-full border border-white/20 text-cream/85 transition-all hover:border-gold hover:text-gold"
+            >
+              <Facebook size={18} />
+            </a>
+          )}
+          {agent.tiktok && (
+            <a
+              href={agent.tiktok}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="TikTok"
+              className="grid h-11 w-11 place-items-center rounded-full border border-white/20 text-cream/85 transition-all hover:border-gold hover:text-gold"
+            >
+              <Music2 size={18} />
             </a>
           )}
           {agent.email && (
             <a
               href={`mailto:${agent.email}`}
-              className="flex flex-1 items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-2.5 text-sm text-cream/85 transition-all hover:border-gold hover:text-gold"
+              aria-label="Email"
+              className="grid h-11 w-11 place-items-center rounded-full border border-white/20 text-cream/85 transition-all hover:border-gold hover:text-gold"
             >
-              <Mail size={16} /> Email
+              <Mail size={18} />
             </a>
           )}
         </div>

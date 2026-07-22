@@ -26,6 +26,8 @@ export interface Agent {
   whatsapp: string // international digits only
   phoneDisplay: string
   instagram: string
+  facebook: string
+  tiktok: string
   email: string
 }
 
@@ -201,6 +203,8 @@ export const defaultSettings: SiteSettings = {
       whatsapp: siteConfig.contact.whatsapp,
       phoneDisplay: siteConfig.contact.phoneDisplay,
       instagram: '',
+      facebook: '',
+      tiktok: '',
       email: '',
     },
     {
@@ -212,6 +216,8 @@ export const defaultSettings: SiteSettings = {
       whatsapp: siteConfig.contact.whatsapp,
       phoneDisplay: siteConfig.contact.phoneDisplay,
       instagram: '',
+      facebook: '',
+      tiktok: '',
       email: '',
     },
   ],

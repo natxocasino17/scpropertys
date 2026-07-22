@@ -453,6 +453,14 @@ function AgentEditor({ agent, onChange }: { agent: Agent; onChange: (a: Agent) =
             <input value={agent.instagram} onChange={(e) => onChange({ ...agent, instagram: e.target.value })} placeholder="https://instagram.com/…" className={input} />
           </div>
           <div>
+            <label className={label}>Facebook (URL)</label>
+            <input value={agent.facebook} onChange={(e) => onChange({ ...agent, facebook: e.target.value })} placeholder="https://facebook.com/…" className={input} />
+          </div>
+          <div>
+            <label className={label}>TikTok (URL)</label>
+            <input value={agent.tiktok} onChange={(e) => onChange({ ...agent, tiktok: e.target.value })} placeholder="https://tiktok.com/@…" className={input} />
+          </div>
+          <div>
             <label className={label}>🔑 {t.admin.emailLabel} (login)</label>
             <input value={agent.email} onChange={(e) => onChange({ ...agent, email: e.target.value })} placeholder="ailana@gmail.com" className={input} />
             <p className="mt-1 text-[11px] text-amber-300/80">{t.admin.agentEmailHint}</p>
