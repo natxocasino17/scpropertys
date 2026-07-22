@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, Save, Loader2, Check } from 'lucide-react'
 import { AdminLayout } from '../../components/admin/AdminLayout'
 import { ImageManager } from '../../components/admin/ImageManager'
+import { AdminNotes } from '../../components/admin/AdminNotes'
 import { Spinner } from '../../components/ui/Spinner'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { useSettings } from '../../context/SettingsContext'
@@ -12,7 +13,10 @@ import {
   adminFetchPropertyById,
   createProperty,
   updateProperty,
+  fetchPropertyNotes,
+  savePropertyNotes,
 } from '../../lib/propertiesService'
+import type { AdminNote } from '../../types/property'
 import { parseVideo } from '../../lib/video'
 import { slugify, classNames } from '../../lib/format'
 import type {
@@ -51,15 +55,18 @@ const empty: PropertyInput = {
   lat: null,
   lng: null,
   featured: false,
+  agent_id: '',
 }
 
 export default function AdminPropertyFormPage() {
   const { id } = useParams<{ id: string }>()
   const isEdit = Boolean(id)
   const { t } = useLanguage()
+  const { settings } = useSettings()
   const navigate = useNavigate()
 
   const [form, setForm] = useState<PropertyInput>(empty)
+  const [notes, setNotes] = useState<AdminNote[]>([])
   const [loading, setLoading] = useState(isEdit)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -68,13 +75,14 @@ export default function AdminPropertyFormPage() {
 
   useEffect(() => {
     if (!isEdit) return
-    adminFetchPropertyById(id!)
-      .then((p) => {
+    Promise.all([adminFetchPropertyById(id!), fetchPropertyNotes(id!)])
+      .then(([p, n]) => {
         if (p) {
           const { id: _id, created_at: _c, ...rest } = p
           setForm({ ...empty, ...rest, video_url: p.video_url ?? '' })
           setSlugTouched(true)
         }
+        setNotes(n)
       })
       .finally(() => setLoading(false))
   }, [id, isEdit])
@@ -116,12 +124,12 @@ export default function AdminPropertyFormPage() {
         lat: form.lat ? Number(form.lat) : null,
         lng: form.lng ? Number(form.lng) : null,
         video_url: form.video_url || null,
+        agent_id: form.agent_id || null,
       }
-      if (isEdit) {
-        await updateProperty(id!, payload)
-      } else {
-        await createProperty(payload)
-      }
+      const saved = isEdit
+        ? await updateProperty(id!, payload)
+        : await createProperty(payload)
+      await savePropertyNotes(saved.id, notes)
       setSaved(true)
       setTimeout(() => navigate('/admin'), 700)
     } catch (e) {
@@ -255,6 +263,21 @@ export default function AdminPropertyFormPage() {
               <ZonePicker value={form.zone} onChange={(v) => set('zone', v)} />
             </div>
             <div>
+              <label className={label}>{t.admin.agentLabel}</label>
+              <select
+                value={form.agent_id ?? ''}
+                onChange={(e) => set('agent_id', e.target.value)}
+                className={input}
+              >
+                <option value="">{t.admin.agentNone}</option>
+                {settings.agents.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
               <label className={label}>{t.detail.land} (m²)</label>
               <input
                 type="number"
@@ -376,6 +399,12 @@ export default function AdminPropertyFormPage() {
               />
             </div>
           </div>
+        </Section>
+
+        {/* Private admin notes */}
+        <Section title={`🔒 ${t.admin.notesSection}`}>
+          <p className="mb-4 text-xs text-faint">{t.admin.notesHint}</p>
+          <AdminNotes notes={notes} onChange={setNotes} />
         </Section>
 
         {error && (

@@ -49,9 +49,25 @@ export interface Property {
   lat?: number | null
   lng?: number | null
   featured: boolean
+  /** Which agent sells this property (Agent.id). */
+  agent_id?: string | null
   /** Manual display order (lower = shown first). Managed from the admin list. */
   position?: number
   created_at?: string
+}
+
+export interface AdminNoteFile {
+  path: string // storage path in the private bucket
+  name: string
+  type: string // mime type
+}
+
+export interface AdminNote {
+  id: string
+  text: string
+  author: string // agent id or free name
+  files: AdminNoteFile[]
+  created_at: string
 }
 
 export type PropertyInput = Omit<Property, 'id' | 'created_at' | 'position'>

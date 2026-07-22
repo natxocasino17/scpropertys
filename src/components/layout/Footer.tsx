@@ -55,6 +55,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link to="/nosotros" className="transition-colors hover:text-gold">
+                  {t.nav.about}
+                </Link>
+              </li>
+              <li>
                 <Link to="/contacto" className="transition-colors hover:text-gold">
                   {t.nav.contact}
                 </Link>

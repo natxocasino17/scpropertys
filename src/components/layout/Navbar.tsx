@@ -32,6 +32,7 @@ export function Navbar() {
   const links = [
     { to: '/', label: t.nav.home },
     { to: '/propiedades', label: t.nav.properties },
+    { to: '/nosotros', label: t.nav.about },
     { to: '/contacto', label: t.nav.contact },
   ]
 

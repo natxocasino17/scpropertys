@@ -11,10 +11,14 @@ export const TABLES = {
   properties: `${DB_PREFIX}properties`,
   leads: `${DB_PREFIX}leads`,
   settings: `${DB_PREFIX}settings`,
+  notes: `${DB_PREFIX}property_notes`,
 }
 
 /** Storage bucket name (Supabase buckets can't contain "_", so we use "-"). */
 export const STORAGE_BUCKET = `${DB_PREFIX.replace(/_/g, '-')}media`
+
+/** Private bucket for admin-only files (plans, PDFs). Not publicly readable. */
+export const STORAGE_PRIVATE_BUCKET = `${DB_PREFIX.replace(/_/g, '-')}private`
 
 /** Is Supabase configured? If not, the site runs in beautiful demo mode. */
 export const isSupabaseConfigured = Boolean(url && anonKey)

@@ -38,6 +38,21 @@ create table if not exists public.sc_properties (
 
 -- For existing installs: add the manual-order column if it isn't there yet.
 alter table public.sc_properties add column if not exists position int not null default 0;
+-- Which agent sells the property (Agent.id from settings)
+alter table public.sc_properties add column if not exists agent_id text;
+
+-- ───────────── Admin-only property notes (private, never public) ─────────────
+create table if not exists public.sc_property_notes (
+  property_id uuid primary key references public.sc_properties(id) on delete cascade,
+  notes jsonb not null default '[]',
+  updated_at timestamptz not null default now()
+);
+alter table public.sc_property_notes enable row level security;
+drop policy if exists "sc_property_notes admin all" on public.sc_property_notes;
+create policy "sc_property_notes admin all"
+  on public.sc_property_notes for all to authenticated
+  using (true) with check (true);
+-- (No anon policy on purpose: the public/anon key cannot read these notes.)
 
 create index if not exists sc_properties_created_idx on public.sc_properties (created_at desc);
 create index if not exists sc_properties_slug_idx on public.sc_properties (slug);
@@ -136,3 +151,18 @@ create policy "sc-media admin write"
   to authenticated
   using (bucket_id = 'sc-media')
   with check (bucket_id = 'sc-media');
+
+-- ────────────────────────────────────────────────────────────────────
+--  PRIVATE bucket for admin files (plans, PDFs). NOT public.
+-- ────────────────────────────────────────────────────────────────────
+insert into storage.buckets (id, name, public)
+values ('sc-private', 'sc-private', false)
+on conflict (id) do nothing;
+
+-- Only authenticated admins can read/write private files (via signed URLs):
+drop policy if exists "sc-private admin all" on storage.objects;
+create policy "sc-private admin all"
+  on storage.objects for all
+  to authenticated
+  using (bucket_id = 'sc-private')
+  with check (bucket_id = 'sc-private');

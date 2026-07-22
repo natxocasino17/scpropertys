@@ -17,6 +17,18 @@ export interface ServiceItem {
   descEn: string
 }
 
+export interface Agent {
+  id: string // stable key, e.g. 'yael' — used to assign properties
+  name: string
+  photo: string
+  bioEs: string
+  bioEn: string
+  whatsapp: string // international digits only
+  phoneDisplay: string
+  instagram: string
+  email: string
+}
+
 export interface SiteSettings {
   brand: string
   brandSuffix: string
@@ -75,6 +87,15 @@ export interface SiteSettings {
   // Footer
   footerTaglineEs: string
   footerTaglineEn: string
+  // About / "Conózcanos" page
+  aboutEyebrowEs: string
+  aboutEyebrowEn: string
+  aboutTitleEs: string
+  aboutTitleEn: string
+  aboutSubtitleEs: string
+  aboutSubtitleEn: string
+  // The two (or more) agents / sellers
+  agents: Agent[]
   // Managed list of property locations / zones (single source of truth)
   zones: string[]
   whatsapp: string
@@ -164,6 +185,36 @@ export const defaultSettings: SiteSettings = {
   contactSubtitleEn: en.contact.subtitle,
   footerTaglineEs: es.footer.tagline,
   footerTaglineEn: en.footer.tagline,
+  aboutEyebrowEs: 'Conócenos',
+  aboutEyebrowEn: 'Meet us',
+  aboutTitleEs: 'Las personas detrás de cada propiedad',
+  aboutTitleEn: 'The people behind every property',
+  aboutSubtitleEs: 'Un equipo local que conoce el Caribe Sur como su casa.',
+  aboutSubtitleEn: 'A local team that knows the South Caribbean like home.',
+  agents: [
+    {
+      id: 'yael',
+      name: 'Yael',
+      photo: '',
+      bioEs: 'Agente inmobiliario en el Caribe Sur. Escribe una breve descripción aquí.',
+      bioEn: 'Real estate agent in the South Caribbean. Write a short bio here.',
+      whatsapp: siteConfig.contact.whatsapp,
+      phoneDisplay: siteConfig.contact.phoneDisplay,
+      instagram: '',
+      email: '',
+    },
+    {
+      id: 'ailana',
+      name: 'Ailana',
+      photo: '',
+      bioEs: 'Agente inmobiliaria en el Caribe Sur. Escribe una breve descripción aquí.',
+      bioEn: 'Real estate agent in the South Caribbean. Write a short bio here.',
+      whatsapp: siteConfig.contact.whatsapp,
+      phoneDisplay: siteConfig.contact.phoneDisplay,
+      instagram: '',
+      email: '',
+    },
+  ],
   zones: [
     'Cahuita',
     'Cocles',

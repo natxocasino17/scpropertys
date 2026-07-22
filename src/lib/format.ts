@@ -18,7 +18,12 @@ export function formatArea(m2: number): string {
 /** Build a WhatsApp deep link with a pre-filled message. Uses the live, admin-editable number. */
 export function whatsappLink(message: string): string {
   const raw = getSettings().whatsapp || siteConfig.contact.whatsapp
-  const num = raw.replace(/\D/g, '')
+  return whatsappLinkTo(raw, message)
+}
+
+/** Build a WhatsApp deep link to a specific number (e.g. a given agent). */
+export function whatsappLinkTo(number: string, message: string): string {
+  const num = (number || getSettings().whatsapp || siteConfig.contact.whatsapp).replace(/\D/g, '')
   return `https://wa.me/${num}?text=${encodeURIComponent(message)}`
 }
 

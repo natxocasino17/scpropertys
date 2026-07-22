@@ -8,6 +8,7 @@ import { Spinner } from './components/ui/Spinner'
 import HomePage from './pages/HomePage'
 import PropertiesPage from './pages/PropertiesPage'
 import ContactPage from './pages/ContactPage'
+import AboutPage from './pages/AboutPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 // Detail page pulls in Leaflet → load it on demand.
@@ -53,6 +54,7 @@ export default function App() {
             <Route path="/" element={<Page><HomePage /></Page>} />
             <Route path="/propiedades" element={<Page><PropertiesPage /></Page>} />
             <Route path="/propiedades/:slug" element={<Page><PropertyDetailPage /></Page>} />
+            <Route path="/nosotros" element={<Page><AboutPage /></Page>} />
             <Route path="/contacto" element={<Page><ContactPage /></Page>} />
 
             {/* Admin */}

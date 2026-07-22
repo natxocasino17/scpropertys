@@ -4,7 +4,7 @@ import { AdminLayout } from '../../components/admin/AdminLayout'
 import { Spinner } from '../../components/ui/Spinner'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { useSettings } from '../../context/SettingsContext'
-import { fetchSettings, saveSettings, SiteSettings, StatItem, ServiceItem } from '../../lib/settings'
+import { fetchSettings, saveSettings, SiteSettings, StatItem, ServiceItem, Agent } from '../../lib/settings'
 import { uploadImage } from '../../lib/propertiesService'
 import { compressImage } from '../../lib/imageCompress'
 import { isSupabaseConfigured } from '../../lib/supabase'
@@ -231,6 +231,31 @@ export default function AdminSettingsPage() {
           {bi(t.admin.footerTagline, 'footerTaglineEs', 'footerTaglineEn')}
         </Section>
 
+        {/* Agents / sellers */}
+        <Section title={t.admin.agentsSection}>
+          <p className="mb-4 text-xs text-faint">{t.admin.agentsHint}</p>
+          <div className="space-y-5">
+            {form.agents.map((agent, i) => (
+              <AgentEditor
+                key={agent.id}
+                agent={agent}
+                onChange={(next) =>
+                  set('agents', form.agents.map((a, idx) => (idx === i ? next : a)))
+                }
+              />
+            ))}
+          </div>
+        </Section>
+
+        {/* About page header */}
+        <Section title={t.admin.aboutSection}>
+          <div className="space-y-4">
+            {bi(t.admin.eyebrowLabel, 'aboutEyebrowEs', 'aboutEyebrowEn')}
+            {bi(t.admin.titleLabel, 'aboutTitleEs', 'aboutTitleEn')}
+            {bi(t.admin.subtitleLabel, 'aboutSubtitleEs', 'aboutSubtitleEn')}
+          </div>
+        </Section>
+
         {/* Zones / locations */}
         <Section title={t.admin.zonesSection}>
           <p className="mb-4 text-xs text-faint">{t.admin.zonesHint}</p>
@@ -386,6 +411,58 @@ function StatEditor({
         <div>
           <label className={label}>{t.admin.statLabelEnLabel}</label>
           <input value={stat.labelEn} onChange={(e) => onChange({ ...stat, labelEn: e.target.value })} className={input} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function AgentEditor({ agent, onChange }: { agent: Agent; onChange: (a: Agent) => void }) {
+  const { t } = useLanguage()
+  const input =
+    'w-full rounded-xl border border-white/15 bg-ink-800 px-3 py-2 text-sm text-cream placeholder:text-faint focus:border-gold focus:outline-none'
+  const label = 'mb-1 block text-[10px] uppercase tracking-wide text-faint'
+
+  return (
+    <div className="rounded-xl border border-white/10 bg-ink-800/60 p-4">
+      <div className="grid gap-4 md:grid-cols-[180px_1fr]">
+        <div>
+          <label className={label}>{t.admin.agentPhoto}</label>
+          <SingleImageInput
+            value={agent.photo}
+            onChange={(v) => onChange({ ...agent, photo: v })}
+            placeholder={t.admin.imgUrlPlaceholder}
+          />
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <label className={label}>{t.admin.agentName}</label>
+            <input value={agent.name} onChange={(e) => onChange({ ...agent, name: e.target.value })} className={input} />
+          </div>
+          <div>
+            <label className={label}>{t.admin.whatsappNum}</label>
+            <input value={agent.whatsapp} onChange={(e) => onChange({ ...agent, whatsapp: e.target.value })} placeholder="50688887777" className={input} />
+          </div>
+          <div>
+            <label className={label}>{t.admin.phoneLabel}</label>
+            <input value={agent.phoneDisplay} onChange={(e) => onChange({ ...agent, phoneDisplay: e.target.value })} className={input} />
+          </div>
+          <div>
+            <label className={label}>{t.admin.agentInstagram}</label>
+            <input value={agent.instagram} onChange={(e) => onChange({ ...agent, instagram: e.target.value })} placeholder="https://instagram.com/…" className={input} />
+          </div>
+          <div>
+            <label className={label}>{t.admin.emailLabel}</label>
+            <input value={agent.email} onChange={(e) => onChange({ ...agent, email: e.target.value })} className={input} />
+          </div>
+          <div>
+            <label className={label}>{t.admin.agentBio} (ES)</label>
+            <textarea rows={2} value={agent.bioEs} onChange={(e) => onChange({ ...agent, bioEs: e.target.value })} className={`${input} resize-none`} />
+          </div>
+          <div>
+            <label className={label}>{t.admin.agentBio} (EN)</label>
+            <textarea rows={2} value={agent.bioEn} onChange={(e) => onChange({ ...agent, bioEn: e.target.value })} className={`${input} resize-none`} />
+          </div>
         </div>
       </div>
     </div>

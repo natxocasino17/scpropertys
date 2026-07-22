@@ -1,6 +1,12 @@
-import { getSupabase, TABLES, STORAGE_BUCKET, isSupabaseConfigured } from './supabase'
+import {
+  getSupabase,
+  TABLES,
+  STORAGE_BUCKET,
+  STORAGE_PRIVATE_BUCKET,
+  isSupabaseConfigured,
+} from './supabase'
 import { demoProperties } from '../data/demoProperties'
-import type { Property, PropertyInput, Lead } from '../types/property'
+import type { Property, PropertyInput, Lead, AdminNote } from '../types/property'
 
 export interface FetchResult {
   properties: Property[]
@@ -138,6 +144,58 @@ export async function uploadImage(file: File): Promise<string> {
   if (error) throw error
   const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path)
   return data.publicUrl
+}
+
+/* ───────────── Admin-only property notes (separate, private table) ───────────── */
+
+export async function fetchPropertyNotes(propertyId: string): Promise<AdminNote[]> {
+  const supabase = getSupabase()
+  if (!supabase || !propertyId) return []
+  const { data, error } = await supabase
+    .from(TABLES.notes)
+    .select('notes')
+    .eq('property_id', propertyId)
+    .maybeSingle()
+  if (error || !data) return []
+  return (data.notes as AdminNote[]) ?? []
+}
+
+export async function savePropertyNotes(propertyId: string, notes: AdminNote[]): Promise<void> {
+  const supabase = getSupabase()
+  if (!supabase || !propertyId) return
+  const { error } = await supabase
+    .from(TABLES.notes)
+    .upsert({ property_id: propertyId, notes, updated_at: new Date().toISOString() })
+  if (error) throw error
+}
+
+/* ───────────── Private admin files (plans, PDFs) ───────────── */
+
+/** Upload a file to the PRIVATE bucket. Returns the storage path (not a URL). */
+export async function uploadPrivateFile(
+  file: File,
+): Promise<{ path: string; name: string; type: string }> {
+  const supabase = getSupabase()
+  if (!supabase) throw new Error('not-configured')
+  const ext = file.name.split('.').pop() || 'bin'
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+  const { error } = await supabase.storage.from(STORAGE_PRIVATE_BUCKET).upload(path, file, {
+    cacheControl: '3600',
+    upsert: false,
+  })
+  if (error) throw error
+  return { path, name: file.name, type: file.type || 'application/octet-stream' }
+}
+
+/** Create a short-lived signed URL to view/download a private file (admin only). */
+export async function signPrivateFile(path: string, expiresIn = 3600): Promise<string | null> {
+  const supabase = getSupabase()
+  if (!supabase) return null
+  const { data, error } = await supabase.storage
+    .from(STORAGE_PRIVATE_BUCKET)
+    .createSignedUrl(path, expiresIn)
+  if (error) return null
+  return data.signedUrl
 }
 
 /* ───────────── Leads ───────────── */

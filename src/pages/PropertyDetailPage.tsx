@@ -9,6 +9,7 @@ import {
   Maximize,
   Ruler,
   Home as HomeIcon,
+  User as UserIcon,
   Share2,
   Check,
   Play,
@@ -23,14 +24,16 @@ import { Reveal } from '../components/ui/Reveal'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useProperties } from '../hooks/useProperties'
 import { fetchPropertyBySlug } from '../lib/propertiesService'
-import { formatPrice, formatArea, whatsappLink } from '../lib/format'
+import { formatPrice, formatArea, whatsappLink, whatsappLinkTo } from '../lib/format'
 import { parseVideo } from '../lib/video'
+import { useSettings } from '../context/SettingsContext'
 import { amenityIcon, typeIcon } from '../lib/amenityIcons'
 import type { Property } from '../types/property'
 
 export default function PropertyDetailPage() {
   const { slug } = useParams<{ slug: string }>()
   const { t, lang } = useLanguage()
+  const { settings } = useSettings()
   const { properties } = useProperties()
   const [property, setProperty] = useState<Property | null>(null)
   const [loading, setLoading] = useState(true)
@@ -90,6 +93,8 @@ export default function PropertyDetailPage() {
   ].filter(Boolean) as { Icon: typeof BedDouble; label: string; value: string }[]
 
   const waMessage = t.contact.prefill + title
+  const agent = settings.agents?.find((a) => a.id === property.agent_id) ?? null
+  const waHref = agent ? whatsappLinkTo(agent.whatsapp, waMessage) : whatsappLink(waMessage)
   const similar = properties
     .filter((p) => p.id !== property.id && (p.zone === property.zone || p.type === property.type))
     .slice(0, 3)
@@ -264,15 +269,40 @@ export default function PropertyDetailPage() {
 
                   <div className="my-6 h-px bg-white/10" />
 
+                  {/* Assigned agent */}
+                  {agent && (
+                    <div className="mb-5 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                      {agent.photo ? (
+                        <img
+                          src={agent.photo}
+                          alt={agent.name}
+                          className="h-12 w-12 shrink-0 rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-gold/40 text-gold">
+                          <UserIcon size={20} strokeWidth={1.5} />
+                        </span>
+                      )}
+                      <div className="min-w-0">
+                        <div className="text-[11px] uppercase tracking-wide text-faint">
+                          {t.detail.agentLabel}
+                        </div>
+                        <div className="font-display text-lg leading-tight text-cream">
+                          {agent.name}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <p className="text-sm leading-relaxed text-mist">{t.detail.enquire}</p>
 
                   <a
-                    href={whatsappLink(waMessage)}
+                    href={waHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn-gold mt-5 w-full"
                   >
-                    {t.detail.whatsapp}
+                    {agent ? `${t.detail.whatsapp} · ${agent.name}` : t.detail.whatsapp}
                   </a>
                   <Link to="/contacto" className="btn-ghost mt-3 w-full">
                     {t.contact.title}
