@@ -46,10 +46,10 @@ export default function AboutPage() {
 
       <section className="container-luxe pb-24">
         {agents.length === 2 ? (
-          <div className="grid items-start gap-10 md:grid-cols-[1fr_auto_1fr] md:gap-4">
+          <div className="grid items-start gap-12 sm:grid-cols-[1fr_auto_1fr] sm:gap-6">
             <AgentBlock agent={agents[0]} lang={lang} align="right" />
-            {/* Center divider */}
-            <div className="hidden md:flex md:flex-col md:items-center md:self-stretch">
+            {/* Center divider — side-by-side screens only */}
+            <div className="hidden sm:flex sm:flex-col sm:items-center sm:self-stretch">
               <div className="h-full w-px bg-gradient-to-b from-transparent via-gold/40 to-transparent" />
             </div>
             <AgentBlock agent={agents[1]} lang={lang} align="left" />
@@ -78,7 +78,7 @@ function AgentBlock({
   const { t } = useLanguage()
   const bio = lang === 'es' ? agent.bioEs : agent.bioEn
   const alignClass =
-    align === 'right' ? 'md:items-end md:text-right' : align === 'left' ? 'md:items-start md:text-left' : 'items-center text-center'
+    align === 'right' ? 'sm:items-end sm:text-right' : align === 'left' ? 'sm:items-start sm:text-left' : 'items-center text-center'
 
   return (
     <Reveal className={`flex flex-col items-center text-center ${alignClass}`}>
