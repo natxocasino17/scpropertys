@@ -6,11 +6,13 @@ import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { Logo } from '../../components/ui/Logo'
 import { NotConfigured } from './NotConfigured'
+import { useNoIndex } from '../../lib/seo'
 
 export default function AdminLoginPage() {
   const { signIn, configured } = useAuth()
   const { t } = useLanguage()
   const navigate = useNavigate()
+  useNoIndex()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')

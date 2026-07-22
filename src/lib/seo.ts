@@ -43,6 +43,14 @@ export function siteBaseUrl(): string {
   return typeof window !== 'undefined' ? window.location.origin : ''
 }
 
+/** Mark the current (admin) page as noindex,nofollow so search engines skip it. */
+export function useNoIndex() {
+  useEffect(() => {
+    upsertMeta('name', 'robots', 'noindex,nofollow')
+    document.title = "Admin · Small Property's"
+  }, [])
+}
+
 interface SeoOptions {
   title: string
   description?: string

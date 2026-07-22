@@ -5,11 +5,13 @@ import { Logo } from '../ui/Logo'
 import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { classNames } from '../../lib/format'
+import { useNoIndex } from '../../lib/seo'
 
 export function AdminLayout({ children }: { children: ReactNode }) {
   const { signOut, user } = useAuth()
   const { t } = useLanguage()
   const navigate = useNavigate()
+  useNoIndex()
 
   async function handleSignOut() {
     await signOut()
