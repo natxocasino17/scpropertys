@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { ScrollToTop } from './components/layout/ScrollToTop'
 import { ProtectedRoute } from './components/admin/ProtectedRoute'
 import { Spinner } from './components/ui/Spinner'
+import { SeoBusiness } from './components/SeoBusiness'
 
 import HomePage from './pages/HomePage'
 import PropertiesPage from './pages/PropertiesPage'
@@ -48,6 +49,7 @@ export default function App() {
   return (
     <>
       <ScrollToTop />
+      <SeoBusiness />
       <AnimatePresence mode="wait">
         <Suspense fallback={<Loader />}>
           <Routes location={location} key={location.pathname}>

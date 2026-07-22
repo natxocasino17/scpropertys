@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion'
-import { Instagram, User } from 'lucide-react'
+import { Instagram, User, Mail, MessageCircle } from 'lucide-react'
 import { PublicLayout } from '../components/layout/PublicLayout'
 import { Reveal } from '../components/ui/Reveal'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSettings } from '../context/SettingsContext'
+import { useSeo } from '../lib/seo'
 import { whatsappLinkTo } from '../lib/format'
 import type { Agent } from '../lib/settings'
 
@@ -11,6 +12,12 @@ export default function AboutPage() {
   const { t, lang } = useLanguage()
   const { settings } = useSettings()
   const agents = settings.agents ?? []
+
+  useSeo({
+    title: `${lang === 'es' ? settings.aboutTitleEs : settings.aboutTitleEn} — ${settings.brand}`,
+    description: lang === 'es' ? settings.aboutSubtitleEs : settings.aboutSubtitleEn,
+    image: agents[0]?.photo || settings.heroImage,
+  })
 
   return (
     <PublicLayout>
@@ -93,26 +100,38 @@ function AgentBlock({
       <h2 className="mt-6 font-display text-3xl text-cream md:text-4xl">{agent.name}</h2>
       {bio && <p className="mt-3 max-w-sm text-sm leading-relaxed text-mist">{bio}</p>}
 
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+      {/* Contacts — clear WhatsApp / Instagram / Email */}
+      <div className="mt-6 flex w-full max-w-sm flex-col gap-2.5">
         <a
           href={whatsappLinkTo(agent.whatsapp, t.contact.prefillGeneric)}
           target="_blank"
           rel="noopener noreferrer"
-          className="btn-gold !px-5 !py-2.5"
+          className="flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-sm font-medium text-white transition-transform hover:scale-[1.02]"
         >
-          WhatsApp
+          <MessageCircle size={17} /> WhatsApp
+          {agent.phoneDisplay && <span className="opacity-80">· {agent.phoneDisplay}</span>}
         </a>
-        {agent.instagram && (
-          <a
-            href={agent.instagram}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="grid h-11 w-11 place-items-center rounded-full border border-white/20 text-cream/80 transition-all hover:border-gold hover:text-gold"
-            aria-label="Instagram"
-          >
-            <Instagram size={18} />
-          </a>
-        )}
+
+        <div className="flex gap-2.5">
+          {agent.instagram && (
+            <a
+              href={agent.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-1 items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-2.5 text-sm text-cream/85 transition-all hover:border-gold hover:text-gold"
+            >
+              <Instagram size={16} /> Instagram
+            </a>
+          )}
+          {agent.email && (
+            <a
+              href={`mailto:${agent.email}`}
+              className="flex flex-1 items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-2.5 text-sm text-cream/85 transition-all hover:border-gold hover:text-gold"
+            >
+              <Mail size={16} /> Email
+            </a>
+          )}
+        </div>
       </div>
     </Reveal>
   )

@@ -7,6 +7,7 @@ import { Spinner } from '../components/ui/Spinner'
 import { useProperties } from '../hooks/useProperties'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSettings } from '../context/SettingsContext'
+import { useSeo } from '../lib/seo'
 import { classNames } from '../lib/format'
 import type { PropertyType } from '../types/property'
 
@@ -17,6 +18,11 @@ export default function PropertiesPage() {
   const { t, lang } = useLanguage()
   const { settings } = useSettings()
   const { properties, loading } = useProperties()
+
+  useSeo({
+    title: `${lang === 'es' ? settings.portfolioTitleEs : settings.portfolioTitleEn} — ${settings.brand}`,
+    description: lang === 'es' ? settings.portfolioSubtitleEs : settings.portfolioSubtitleEn,
+  })
 
   const [search, setSearch] = useState('')
   const [type, setType] = useState<PropertyType | 'all'>('all')

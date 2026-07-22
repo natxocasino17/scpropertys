@@ -6,6 +6,7 @@ import { LazyMap } from '../components/property/LazyMap'
 import { Reveal } from '../components/ui/Reveal'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSettings } from '../context/SettingsContext'
+import { useSeo } from '../lib/seo'
 import { submitLead } from '../lib/propertiesService'
 import { whatsappLink, whatsappLinkTo } from '../lib/format'
 
@@ -14,6 +15,11 @@ type Status = 'idle' | 'sending' | 'success' | 'error'
 export default function ContactPage() {
   const { t, lang } = useLanguage()
   const { settings } = useSettings()
+
+  useSeo({
+    title: `${lang === 'es' ? settings.contactTitleEs : settings.contactTitleEn} — ${settings.brand}`,
+    description: lang === 'es' ? settings.contactSubtitleEs : settings.contactSubtitleEn,
+  })
   const [status, setStatus] = useState<Status>('idle')
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
 

@@ -27,6 +27,7 @@ import { fetchPropertyBySlug } from '../lib/propertiesService'
 import { formatPrice, formatArea, whatsappLink, whatsappLinkTo } from '../lib/format'
 import { parseVideo } from '../lib/video'
 import { useSettings } from '../context/SettingsContext'
+import { useSeo } from '../lib/seo'
 import { amenityIcon, typeIcon } from '../lib/amenityIcons'
 import type { Property } from '../types/property'
 
@@ -49,6 +50,40 @@ export default function PropertyDetailPage() {
       active = false
     }
   }, [slug])
+
+  // SEO (hook must run every render — build from property when available)
+  const seoName = property ? (lang === 'es' ? property.title_es : property.title_en) : settings.brand
+  const seoDesc = property
+    ? (lang === 'es' ? property.description_es : property.description_en).replace(/\s+/g, ' ').slice(0, 160)
+    : ''
+  const availabilityMap: Record<string, string> = {
+    available: 'https://schema.org/InStock',
+    reserved: 'https://schema.org/LimitedAvailability',
+    sold: 'https://schema.org/SoldOut',
+  }
+  useSeo({
+    title: property ? `${seoName} · ${property.zone} — ${settings.brand}` : settings.brand,
+    description: seoDesc,
+    image: property?.images?.[0],
+    type: 'article',
+    jsonLd: property
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: seoName,
+          description: seoDesc,
+          image: property.images,
+          category: 'Real Estate',
+          areaServed: property.zone,
+          offers: {
+            '@type': 'Offer',
+            price: property.price || undefined,
+            priceCurrency: 'USD',
+            availability: availabilityMap[property.status] ?? 'https://schema.org/InStock',
+          },
+        }
+      : null,
+  })
 
   if (loading) {
     return (

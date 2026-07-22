@@ -9,6 +9,13 @@ export const siteConfig = {
   /** Nombre de la marca. Cámbialo cuando definas el nombre real. */
   brand: "Small Property's",
   brandSuffix: 'Real State',
+
+  /**
+   * 👉 Dominio final de la web (para SEO: enlaces canónicos, sitemap, redes).
+   * Déjalo VACÍO y usará el dominio actual automáticamente, o pon el tuyo:
+   * ej. 'https://www.tudominio.com'  (sin barra al final)
+   */
+  siteUrl: '',
   /** Frase corta bajo el logo / en metadatos */
   tagline: {
     es: 'Propiedades exclusivas en el Caribe Sur de Costa Rica',
