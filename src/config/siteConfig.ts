@@ -15,7 +15,7 @@ export const siteConfig = {
    * Déjalo VACÍO y usará el dominio actual automáticamente, o pon el tuyo:
    * ej. 'https://www.tudominio.com'  (sin barra al final)
    */
-  siteUrl: '',
+  siteUrl: 'https://puertoviejo-properties.com',
   /** Frase corta bajo el logo / en metadatos */
   tagline: {
     es: 'Propiedades exclusivas en el Caribe Sur de Costa Rica',

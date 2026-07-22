@@ -2,5 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin
 
-# Cambia el dominio por el tuyo si es distinto:
-Sitemap: https://smallpropertysrealstate.netlify.app/sitemap.xml
+Sitemap: https://puertoviejo-properties.com/sitemap.xml
