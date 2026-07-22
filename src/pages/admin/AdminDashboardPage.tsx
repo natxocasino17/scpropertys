@@ -10,12 +10,15 @@ import {
   deleteProperty,
   importDemoProperties,
   setPropertyPositions,
+  logActivity,
 } from '../../lib/propertiesService'
+import { useAuth } from '../../context/AuthContext'
 import { formatPrice } from '../../lib/format'
 import type { Property } from '../../types/property'
 
 export default function AdminDashboardPage() {
   const { t, lang } = useLanguage()
+  const { user } = useAuth()
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState<string | null>(null)
@@ -70,6 +73,12 @@ export default function AdminDashboardPage() {
     try {
       await deleteProperty(p.id)
       setProperties((prev) => prev.filter((x) => x.id !== p.id))
+      await logActivity({
+        action: 'delete',
+        entity_title: (lang === 'es' ? p.title_es : p.title_en) || p.slug,
+        detail: null,
+        actor_email: user?.email ?? null,
+      })
     } catch (e) {
       alert((e as Error).message)
     } finally {

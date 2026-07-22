@@ -263,6 +263,9 @@ export const translations = {
       attach: 'Adjuntar archivo',
       addNote: 'Agregar nota',
       aboutSection: 'Página · Conózcanos (encabezado)',
+      history: 'Historial',
+      historyHint: 'Registro de cambios: quién creó, editó o eliminó cada propiedad y cuándo.',
+      noHistory: 'Aún no hay cambios registrados.',
     },
   },
 
@@ -528,6 +531,9 @@ export const translations = {
       attach: 'Attach file',
       addNote: 'Add note',
       aboutSection: 'Page · About us (header)',
+      history: 'History',
+      historyHint: 'Change log: who created, edited or deleted each property and when.',
+      noHistory: 'No changes recorded yet.',
     },
   },
 }

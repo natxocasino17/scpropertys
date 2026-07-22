@@ -6,7 +6,7 @@ import {
   isSupabaseConfigured,
 } from './supabase'
 import { demoProperties } from '../data/demoProperties'
-import type { Property, PropertyInput, Lead, AdminNote } from '../types/property'
+import type { Property, PropertyInput, Lead, AdminNote, ActivityLog } from '../types/property'
 
 export interface FetchResult {
   properties: Property[]
@@ -144,6 +144,35 @@ export async function uploadImage(file: File): Promise<string> {
   if (error) throw error
   const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path)
   return data.publicUrl
+}
+
+/* ───────────── Activity log (change history) ───────────── */
+
+export async function logActivity(entry: ActivityLog): Promise<void> {
+  const supabase = getSupabase()
+  if (!supabase) return
+  try {
+    await supabase.from(TABLES.activity).insert({
+      action: entry.action,
+      entity_title: entry.entity_title,
+      detail: entry.detail ?? null,
+      actor_email: entry.actor_email ?? null,
+    })
+  } catch {
+    /* logging must never block the main action */
+  }
+}
+
+export async function fetchActivity(limit = 200): Promise<ActivityLog[]> {
+  const supabase = getSupabase()
+  if (!supabase) return []
+  const { data, error } = await supabase
+    .from(TABLES.activity)
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(limit)
+  if (error) return []
+  return (data ?? []) as ActivityLog[]
 }
 
 /* ───────────── Admin-only property notes (separate, private table) ───────────── */

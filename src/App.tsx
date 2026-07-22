@@ -20,6 +20,7 @@ const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage')
 const AdminPropertyFormPage = lazy(() => import('./pages/admin/AdminPropertyFormPage'))
 const AdminLeadsPage = lazy(() => import('./pages/admin/AdminLeadsPage'))
 const AdminSettingsPage = lazy(() => import('./pages/admin/AdminSettingsPage'))
+const AdminHistoryPage = lazy(() => import('./pages/admin/AdminHistoryPage'))
 
 function Loader() {
   return (
@@ -96,6 +97,14 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <AdminSettingsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/history"
+              element={
+                <ProtectedRoute>
+                  <AdminHistoryPage />
                 </ProtectedRoute>
               }
             />

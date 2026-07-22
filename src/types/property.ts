@@ -70,6 +70,15 @@ export interface AdminNote {
   created_at: string
 }
 
+export interface ActivityLog {
+  id?: string
+  action: 'create' | 'update' | 'delete'
+  entity_title: string
+  detail?: string | null
+  actor_email?: string | null
+  created_at?: string
+}
+
 export type PropertyInput = Omit<Property, 'id' | 'created_at' | 'position'>
 
 export interface Lead {

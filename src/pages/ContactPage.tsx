@@ -7,7 +7,7 @@ import { Reveal } from '../components/ui/Reveal'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSettings } from '../context/SettingsContext'
 import { submitLead } from '../lib/propertiesService'
-import { whatsappLink } from '../lib/format'
+import { whatsappLink, whatsappLinkTo } from '../lib/format'
 
 type Status = 'idle' | 'sending' | 'success' | 'error'
 
@@ -166,12 +166,30 @@ export default function ContactPage() {
               label={t.contact.office}
               value={lang === 'es' ? settings.locationEs : settings.locationEn}
             />
-            <InfoRow
-              Icon={Phone}
-              label="WhatsApp"
-              value={settings.phoneDisplay}
-              href={whatsappLink(t.contact.prefillGeneric)}
-            />
+
+            {/* Both agents */}
+            {(settings.agents ?? []).map((a) => (
+              <a
+                key={a.id}
+                href={whatsappLinkTo(a.whatsapp, t.contact.prefillGeneric)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 rounded-2xl border border-white/10 bg-ink-800 p-4 transition-colors hover:border-gold/40"
+              >
+                {a.photo ? (
+                  <img src={a.photo} alt={a.name} className="h-12 w-12 shrink-0 rounded-full object-cover ring-1 ring-white/15" />
+                ) : (
+                  <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-gold/15 font-display text-lg text-gold">
+                    {a.name.charAt(0)}
+                  </span>
+                )}
+                <div className="min-w-0">
+                  <div className="text-[11px] uppercase tracking-wide text-faint">{t.detail.agentLabel}</div>
+                  <div className="font-display text-lg leading-tight text-cream">{a.name}</div>
+                  <div className="text-xs text-gold">{a.phoneDisplay || 'WhatsApp'}</div>
+                </div>
+              </a>
+            ))}
             <InfoRow
               Icon={Mail}
               label={t.contact.email}

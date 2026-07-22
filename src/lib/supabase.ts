@@ -12,6 +12,7 @@ export const TABLES = {
   leads: `${DB_PREFIX}leads`,
   settings: `${DB_PREFIX}settings`,
   notes: `${DB_PREFIX}property_notes`,
+  activity: `${DB_PREFIX}activity_log`,
 }
 
 /** Storage bucket name (Supabase buckets can't contain "_", so we use "-"). */

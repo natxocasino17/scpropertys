@@ -3,7 +3,7 @@ import { Instagram, Facebook, Youtube, Mail, Phone, MapPin } from 'lucide-react'
 import { Logo } from '../ui/Logo'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { useSettings } from '../../context/SettingsContext'
-import { whatsappLink } from '../../lib/format'
+import { whatsappLink, whatsappLinkTo } from '../../lib/format'
 
 export function Footer() {
   const { t, lang } = useLanguage()
@@ -74,17 +74,28 @@ export function Footer() {
                 <MapPin size={16} className="mt-0.5 shrink-0 text-gold" />
                 <span>{lang === 'es' ? settings.locationEs : settings.locationEn}</span>
               </li>
-              <li>
-                <a
-                  href={whatsappLink(t.contact.prefillGeneric)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 transition-colors hover:text-gold"
-                >
-                  <Phone size={16} className="shrink-0 text-gold" />
-                  {settings.phoneDisplay}
-                </a>
-              </li>
+              {(settings.agents ?? []).map((a) => (
+                <li key={a.id} className="flex items-center gap-3">
+                  {a.photo ? (
+                    <img src={a.photo} alt={a.name} className="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-white/15" />
+                  ) : (
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gold/15 text-xs font-medium text-gold">
+                      {a.name.charAt(0)}
+                    </span>
+                  )}
+                  <div className="leading-tight">
+                    <div className="text-cream">{a.name}</div>
+                    <a
+                      href={whatsappLinkTo(a.whatsapp, t.contact.prefillGeneric)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-mist transition-colors hover:text-gold"
+                    >
+                      {a.phoneDisplay || 'WhatsApp'}
+                    </a>
+                  </div>
+                </li>
+              ))}
               <li>
                 <a
                   href={`mailto:${settings.email}`}

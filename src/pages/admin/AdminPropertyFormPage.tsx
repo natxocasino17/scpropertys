@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, Save, Loader2, Check } from 'lucide-react'
 import { AdminLayout } from '../../components/admin/AdminLayout'
@@ -15,10 +15,12 @@ import {
   updateProperty,
   fetchPropertyNotes,
   savePropertyNotes,
+  logActivity,
 } from '../../lib/propertiesService'
-import type { AdminNote } from '../../types/property'
+import type { AdminNote, Property } from '../../types/property'
+import { useAuth } from '../../context/AuthContext'
 import { parseVideo } from '../../lib/video'
-import { slugify, classNames } from '../../lib/format'
+import { slugify, classNames, formatPrice } from '../../lib/format'
 import type {
   PropertyInput,
   PropertyType,
@@ -63,11 +65,26 @@ export default function AdminPropertyFormPage() {
   const isEdit = Boolean(id)
   const { t } = useLanguage()
   const { settings } = useSettings()
+  const { user } = useAuth()
   const navigate = useNavigate()
 
   const [form, setForm] = useState<PropertyInput>(empty)
   const [notes, setNotes] = useState<AdminNote[]>([])
   const [loading, setLoading] = useState(isEdit)
+  const originalRef = useRef<Property | null>(null)
+
+  /** The agent whose email matches the logged-in user (used to auto-assign). */
+  const myAgent = settings.agents?.find(
+    (a) => a.email && user?.email && a.email.toLowerCase() === user.email.toLowerCase(),
+  )
+
+  // New property → auto-assign to the logged-in agent (by email match).
+  useEffect(() => {
+    if (!isEdit && myAgent && !form.agent_id) {
+      setForm((f) => ({ ...f, agent_id: myAgent.id }))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEdit, myAgent?.id])
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
@@ -78,6 +95,7 @@ export default function AdminPropertyFormPage() {
     Promise.all([adminFetchPropertyById(id!), fetchPropertyNotes(id!)])
       .then(([p, n]) => {
         if (p) {
+          originalRef.current = p
           const { id: _id, created_at: _c, ...rest } = p
           setForm({ ...empty, ...rest, video_url: p.video_url ?? '' })
           setSlugTouched(true)
@@ -130,6 +148,25 @@ export default function AdminPropertyFormPage() {
         ? await updateProperty(id!, payload)
         : await createProperty(payload)
       await savePropertyNotes(saved.id, notes)
+
+      // Change history
+      const propTitle = form.title_es || form.title_en || saved.slug
+      if (isEdit) {
+        const detail = buildChangeDetail(originalRef.current, payload)
+        await logActivity({
+          action: 'update',
+          entity_title: propTitle,
+          detail: detail || 'Editada',
+          actor_email: user?.email ?? null,
+        })
+      } else {
+        await logActivity({
+          action: 'create',
+          entity_title: propTitle,
+          detail: payload.price > 0 ? formatPrice(payload.price) : null,
+          actor_email: user?.email ?? null,
+        })
+      }
       setSaved(true)
       setTimeout(() => navigate('/admin'), 700)
     } catch (e) {
@@ -537,6 +574,33 @@ function VideoInput({ value, onChange }: { value: string; onChange: (v: string) 
       )}
     </div>
   )
+}
+
+const STATUS_ES: Record<string, string> = {
+  available: 'Disponible',
+  reserved: 'Reservado',
+  sold: 'Vendido',
+}
+
+/** Human-readable summary of what changed between the saved property and the new values. */
+function buildChangeDetail(original: Property | null, next: PropertyInput): string {
+  if (!original) return 'Editada'
+  const parts: string[] = []
+  if (Number(original.price) !== Number(next.price)) {
+    parts.push(`Precio: ${formatPrice(Number(original.price)) || '—'} → ${formatPrice(Number(next.price)) || '—'}`)
+  }
+  if (original.status !== next.status) {
+    parts.push(`Estado: ${STATUS_ES[original.status] ?? original.status} → ${STATUS_ES[next.status] ?? next.status}`)
+  }
+  if ((original.zone || '') !== (next.zone || '')) {
+    parts.push(`Zona: ${original.zone || '—'} → ${next.zone || '—'}`)
+  }
+  if ((original.agent_id || '') !== (next.agent_id || '')) {
+    parts.push(`Agente: ${original.agent_id || '—'} → ${next.agent_id || '—'}`)
+  }
+  if (original.title_es !== next.title_es) parts.push('Título')
+  if ((original.images?.length ?? 0) !== (next.images?.length ?? 0)) parts.push('Fotos')
+  return parts.length ? parts.join(' · ') : 'Editada'
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {

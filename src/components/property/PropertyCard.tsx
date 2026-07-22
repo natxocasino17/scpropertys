@@ -59,18 +59,31 @@ export function PropertyCard({ property, index = 0 }: { property: Property; inde
             <div className="flex items-center gap-1.5 text-xs text-gold">
               <MapPin size={13} />
               <span className="tracking-wide">{property.zone}</span>
-              {agent && (
-                <span className="tracking-wide text-cream/50">· {agent.name}</span>
-              )}
             </div>
             <h3 className="mt-1.5 font-display text-2xl font-medium leading-tight text-cream transition-colors duration-300 group-hover:text-gold-light">
               {title}
             </h3>
 
-            <div className="mt-3 flex items-center justify-between">
+            <div className="mt-3 flex items-center justify-between gap-3">
               <span className="font-display text-xl text-cream">
                 {property.price > 0 ? formatPrice(property.price) : t.detail.priceOnRequest}
               </span>
+              {agent && (
+                <span className="flex items-center gap-1.5">
+                  {agent.photo ? (
+                    <img
+                      src={agent.photo}
+                      alt={agent.name}
+                      className="h-6 w-6 rounded-full object-cover ring-1 ring-gold/50"
+                    />
+                  ) : (
+                    <span className="grid h-6 w-6 place-items-center rounded-full bg-gold/15 text-[10px] font-medium text-gold ring-1 ring-gold/40">
+                      {agent.name.charAt(0)}
+                    </span>
+                  )}
+                  <span className="text-xs text-cream/60">{agent.name}</span>
+                </span>
+              )}
             </div>
 
             {/* Specs — revealed on hover (desktop), always visible on mobile */}

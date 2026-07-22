@@ -193,8 +193,8 @@ export const defaultSettings: SiteSettings = {
   aboutSubtitleEn: 'A local team that knows the South Caribbean like home.',
   agents: [
     {
-      id: 'yael',
-      name: 'Yael',
+      id: 'iael',
+      name: 'Iael',
       photo: '',
       bioEs: 'Agente inmobiliario en el Caribe Sur. Escribe una breve descripción aquí.',
       bioEn: 'Real estate agent in the South Caribbean. Write a short bio here.',

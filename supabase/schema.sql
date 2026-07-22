@@ -54,6 +54,24 @@ create policy "sc_property_notes admin all"
   using (true) with check (true);
 -- (No anon policy on purpose: the public/anon key cannot read these notes.)
 
+-- ───────────── Change history / activity log (admin only) ─────────────
+create table if not exists public.sc_activity_log (
+  id uuid primary key default gen_random_uuid(),
+  action text not null,
+  entity_title text,
+  detail text,
+  actor_email text,
+  created_at timestamptz not null default now()
+);
+create index if not exists sc_activity_created_idx on public.sc_activity_log (created_at desc);
+alter table public.sc_activity_log enable row level security;
+drop policy if exists "sc_activity admin read" on public.sc_activity_log;
+create policy "sc_activity admin read"
+  on public.sc_activity_log for select to authenticated using (true);
+drop policy if exists "sc_activity admin insert" on public.sc_activity_log;
+create policy "sc_activity admin insert"
+  on public.sc_activity_log for insert to authenticated with check (true);
+
 create index if not exists sc_properties_created_idx on public.sc_properties (created_at desc);
 create index if not exists sc_properties_slug_idx on public.sc_properties (slug);
 
