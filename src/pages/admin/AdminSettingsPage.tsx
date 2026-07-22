@@ -442,6 +442,7 @@ function AgentEditor({ agent, onChange }: { agent: Agent; onChange: (a: Agent) =
           <div>
             <label className={label}>{t.admin.whatsappNum}</label>
             <input value={agent.whatsapp} onChange={(e) => onChange({ ...agent, whatsapp: e.target.value })} placeholder="50688887777" className={input} />
+            <p className="mt-1 text-[11px] text-faint">{t.admin.agentWhatsappHint}</p>
           </div>
           <div>
             <label className={label}>{t.admin.phoneLabel}</label>
@@ -452,8 +453,9 @@ function AgentEditor({ agent, onChange }: { agent: Agent; onChange: (a: Agent) =
             <input value={agent.instagram} onChange={(e) => onChange({ ...agent, instagram: e.target.value })} placeholder="https://instagram.com/…" className={input} />
           </div>
           <div>
-            <label className={label}>{t.admin.emailLabel}</label>
-            <input value={agent.email} onChange={(e) => onChange({ ...agent, email: e.target.value })} className={input} />
+            <label className={label}>🔑 {t.admin.emailLabel} (login)</label>
+            <input value={agent.email} onChange={(e) => onChange({ ...agent, email: e.target.value })} placeholder="ailana@gmail.com" className={input} />
+            <p className="mt-1 text-[11px] text-amber-300/80">{t.admin.agentEmailHint}</p>
           </div>
           <div>
             <label className={label}>{t.admin.agentBio} (ES)</label>

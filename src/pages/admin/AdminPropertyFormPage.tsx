@@ -313,6 +313,21 @@ export default function AdminPropertyFormPage() {
                   </option>
                 ))}
               </select>
+              {form.agent_id ? (
+                <p className="mt-1.5 text-xs text-emerald-300/90">
+                  ✓ {t.admin.agentAssigned}{' '}
+                  {settings.agents.find((a) => a.id === form.agent_id)?.name}
+                </p>
+              ) : (
+                <p className="mt-1.5 text-xs text-amber-300/90">
+                  ⚠ {t.admin.agentUnassignedWarn}
+                </p>
+              )}
+              {!myAgent && (
+                <p className="mt-1 text-xs text-faint">
+                  {t.admin.agentNoMatch} <span className="text-cream/80">{user?.email}</span>
+                </p>
+              )}
             </div>
             <div>
               <label className={label}>{t.detail.land} (m²)</label>
