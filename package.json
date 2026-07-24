@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Small Property's Real State — Luxury real estate portfolio for the South Caribbean of Costa Rica",
+  "description": "Puerto Viejo Properties — Luxury real estate portfolio for the South Caribbean of Costa Rica",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

@@ -47,7 +47,7 @@ export function siteBaseUrl(): string {
 export function useNoIndex() {
   useEffect(() => {
     upsertMeta('name', 'robots', 'noindex,nofollow')
-    document.title = "Admin · Small Property's"
+    document.title = 'Admin · Puerto Viejo Properties'
   }, [])
 }
 

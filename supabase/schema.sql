@@ -1,5 +1,5 @@
 -- ════════════════════════════════════════════════════════════════════
---  Small Property's Real State — Supabase schema
+--  Puerto Viejo Properties — Supabase schema
 --  Prefix: sc_   (so it never collides with your other "multiwebs" sites)
 --
 --  HOW TO USE:

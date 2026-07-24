@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════
-   SITE CONFIG  ·  Small Property's Real State
+   SITE CONFIG  ·  Puerto Viejo Properties
    ----------------------------------------------------------------
    👉  CAMBIA AQUÍ EL NOMBRE, CONTACTO Y REDES CUANDO QUIERAS.
        Todo el sitio (web pública + admin) lee desde este archivo.
@@ -7,8 +7,8 @@
 
 export const siteConfig = {
   /** Nombre de la marca. Cámbialo cuando definas el nombre real. */
-  brand: "Small Property's",
-  brandSuffix: 'Real State',
+  brand: 'Puerto Viejo',
+  brandSuffix: 'Properties',
 
   /**
    * 👉 Dominio final de la web (para SEO: enlaces canónicos, sitemap, redes).
