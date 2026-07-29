@@ -16,7 +16,12 @@
 [[edge_functions]]
   function = "og-preview"
   path = "/*"
-  excludedPath = ["/admin", "/admin/*", "/assets/*"]
+  excludedPath = ["/admin", "/admin/*", "/assets/*", "/sitemap.xml"]
+
+# sitemap.xml with every property URL, read from Supabase on request.
+[[edge_functions]]
+  function = "sitemap"
+  path = "/sitemap.xml"
 
 [[headers]]
   for = "/*"

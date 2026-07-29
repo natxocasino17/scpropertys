@@ -1,15 +1,25 @@
 /**
+ * WhatsApp ignores link-preview images heavier than ~600 KB, so the cover photo
+ * has to stay under that or the property shares with no thumbnail. A single
+ * quality pass isn't enough: jungle and foliage shots are dense in detail and
+ * came out at 600 KB – 1.7 MB even resized to 1920px.
+ */
+const TARGET_BYTES = 480_000
+
+/**
  * Compress & resize an image entirely in the browser BEFORE uploading.
  * - Converts iPhone HEIC/HEIF photos to JPEG (browsers can't display HEIC).
  * - Resizes and re-encodes so an 8 MB phone photo becomes ~200-400 KB,
  *   keeping Supabase Storage usage tiny.
+ * - Keeps re-encoding until it fits TARGET_BYTES, so link previews always work.
  */
 export async function compressImage(
   file: File,
-  opts: { maxSize?: number; quality?: number } = {},
+  opts: { maxSize?: number; quality?: number; maxBytes?: number } = {},
 ): Promise<File> {
   const maxSize = opts.maxSize ?? 1920
   const quality = opts.quality ?? 0.82
+  const maxBytes = opts.maxBytes ?? TARGET_BYTES
 
   const isHeic =
     /heic|heif/i.test(file.type) || /\.(heic|heif)$/i.test(file.name)
@@ -44,18 +54,38 @@ export async function compressImage(
       height = Math.round(height * ratio)
     }
 
-    const canvas = document.createElement('canvas')
-    canvas.width = width
-    canvas.height = height
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return heicFallback(working, file, isHeic)
-    ctx.drawImage(bitmap, 0, 0, width, height)
-    bitmap.close?.()
+    const draw = async (w: number, h: number, q: number): Promise<Blob | null> => {
+      const canvas = document.createElement('canvas')
+      canvas.width = w
+      canvas.height = h
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return null
+      ctx.drawImage(bitmap, 0, 0, w, h)
+      return new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', q))
+    }
 
-    const blob: Blob | null = await new Promise((resolve) =>
-      canvas.toBlob(resolve, 'image/jpeg', quality),
-    )
-    if (!blob) return heicFallback(working, file, isHeic)
+    let blob = await draw(width, height, quality)
+    if (!blob) {
+      bitmap.close?.()
+      return heicFallback(working, file, isHeic)
+    }
+
+    // Still too heavy for a link preview: lower the quality, then the size.
+    for (const step of [
+      { scale: 1, quality: 0.7 },
+      { scale: 1, quality: 0.6 },
+      { scale: 0.8, quality: 0.6 },
+      { scale: 0.65, quality: 0.55 },
+    ]) {
+      if (blob.size <= maxBytes) break
+      const retry = await draw(
+        Math.round(width * step.scale),
+        Math.round(height * step.scale),
+        step.quality,
+      )
+      if (retry && retry.size < blob.size) blob = retry
+    }
+    bitmap.close?.()
     // If canvas output isn't smaller (and we didn't need HEIC conversion), keep original.
     if (!isHeic && blob.size >= file.size) return file
 

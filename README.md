@@ -118,7 +118,9 @@ Esto **no funciona solo** en una web hecha con React: los rastreadores de WhatsA
 **Para que la miniatura salga siempre:**
 
 - La **primera foto** (la marcada con ⭐) es la que se ve — elegí una **horizontal**, se recorta mejor.
-- WhatsApp ignora imágenes de **más de ~600 KB**. Las fotos subidas por el panel se comprimen a ~300 KB, así que no hay problema; si pegás una **URL** externa, que no sea enorme.
+- WhatsApp ignora imágenes de **más de ~600 KB**. El panel ahora comprime cada foto hasta dejarla **por debajo de 480 KB** (baja calidad y tamaño por pasos hasta lograrlo), así que las que subas de aquí en adelante siempre funcionan. Las fotos de selva y follaje son las más pesadas: antes una de 12 MP podía quedar en 1,1 MB.
+- ⚠️ Las fotos **subidas antes de este cambio** pueden pasarse del límite. Si una propiedad comparte sin miniatura, volvé a subir su foto de portada desde el panel (o marcá con ⭐ otra más liviana) y listo.
+- Si pegás una **URL** externa, que la imagen no sea enorme: esa no pasa por la compresión.
 - WhatsApp **cachea** la vista previa de cada enlace por varias horas. Si cambiaste la foto y seguís viendo la vieja, probá agregando `?v=2` al final del link para forzar una nueva lectura.
 - Para depurar Facebook/Instagram: [Sharing Debugger](https://developers.facebook.com/tools/debug/).
 

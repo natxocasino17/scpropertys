@@ -233,11 +233,11 @@ async function buildHtml(html: string, pageUrl: string, pathname: string): Promi
   if (slug) {
     const property = await fetchProperty(slug)
     if (property) {
-      const name = property.title_es || property.title_en || ''
+      // Los títulos cargados a mano suelen traer espacios de sobra.
+      const name = (property.title_es || property.title_en || '').replace(/\s+/g, ' ').trim()
+      const zoneName = (property.zone || '').trim()
       // No repetir la zona si el título ya la nombra ("Casa en Cocles" + "Cocles").
-      const zone = property.zone && !name.toLowerCase().includes(property.zone.toLowerCase())
-        ? property.zone
-        : ''
+      const zone = zoneName && !name.toLowerCase().includes(zoneName.toLowerCase()) ? zoneName : ''
       const heading = [name, zone].filter(Boolean).join(' · ')
       const price = formatUsd(property.price)
       const socialTitle = price ? `${heading} — ${price}` : heading
