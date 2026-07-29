@@ -11,6 +11,13 @@
   to = "/index.html"
   status = 200
 
+# Server-side <head> so WhatsApp/Facebook previews show each property's cover
+# photo, title and price (crawlers don't run the SPA's JavaScript).
+[[edge_functions]]
+  function = "og-preview"
+  path = "/*"
+  excludedPath = ["/admin", "/admin/*", "/assets/*"]
+
 [[headers]]
   for = "/*"
   [headers.values]
