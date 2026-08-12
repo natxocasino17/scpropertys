@@ -11,6 +11,32 @@ import { isSupabaseConfigured } from '../../lib/supabase'
 import { STAT_ICONS, STAT_ICON_KEYS } from '../../lib/statIcons'
 import { classNames } from '../../lib/format'
 
+/**
+ * Agente en blanco para el botón "Agregar agente".
+ *
+ * El `id` es la llave con la que se asignan las propiedades, así que una vez
+ * creado no se toca: si cambiara, las propiedades ya asignadas se quedarían
+ * huérfanas. Por eso se genera aquí y no se edita desde la interfaz.
+ */
+function newAgent(existing: Agent[]): Agent {
+  let id = `agente-${existing.length + 1}`
+  let n = existing.length + 1
+  while (existing.some((a) => a.id === id)) id = `agente-${++n}`
+  return {
+    id,
+    name: '',
+    photo: '',
+    bioEs: '',
+    bioEn: '',
+    whatsapp: '',
+    phoneDisplay: '',
+    instagram: '',
+    facebook: '',
+    tiktok: '',
+    email: '',
+  }
+}
+
 export default function AdminSettingsPage() {
   const { t } = useLanguage()
   const { reload } = useSettings()
@@ -242,9 +268,21 @@ export default function AdminSettingsPage() {
                 onChange={(next) =>
                   set('agents', form.agents.map((a, idx) => (idx === i ? next : a)))
                 }
+                onRemove={
+                  form.agents.length > 1
+                    ? () => set('agents', form.agents.filter((_, idx) => idx !== i))
+                    : undefined
+                }
               />
             ))}
           </div>
+          <button
+            type="button"
+            onClick={() => set('agents', [...form.agents, newAgent(form.agents)])}
+            className="mt-4 inline-flex items-center gap-2 rounded-full border border-gold/40 px-4 py-2 text-xs text-gold transition-colors hover:bg-gold/10"
+          >
+            <Plus size={15} /> {t.admin.agentAdd}
+          </button>
         </Section>
 
         {/* About page header */}
@@ -417,7 +455,16 @@ function StatEditor({
   )
 }
 
-function AgentEditor({ agent, onChange }: { agent: Agent; onChange: (a: Agent) => void }) {
+function AgentEditor({
+  agent,
+  onChange,
+  onRemove,
+}: {
+  agent: Agent
+  onChange: (a: Agent) => void
+  /** Ausente cuando queda un solo agente: el equipo no puede quedar vacío. */
+  onRemove?: () => void
+}) {
   const { t } = useLanguage()
   const input =
     'w-full rounded-xl border border-white/15 bg-ink-800 px-3 py-2 text-sm text-cream placeholder:text-faint focus:border-gold focus:outline-none'
@@ -425,6 +472,19 @@ function AgentEditor({ agent, onChange }: { agent: Agent; onChange: (a: Agent) =
 
   return (
     <div className="rounded-xl border border-white/10 bg-ink-800/60 p-4">
+      {onRemove && (
+        <div className="mb-3 flex justify-end">
+          <button
+            type="button"
+            onClick={() => {
+              if (confirm(`¿Quitar a ${agent.name || 'este agente'} del equipo?`)) onRemove()
+            }}
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1 text-[11px] text-faint transition-colors hover:border-rose-400/50 hover:text-rose-300"
+          >
+            <Trash2 size={13} /> {t.admin.agentRemove}
+          </button>
+        </div>
+      )}
       <div className="grid gap-4 md:grid-cols-[180px_1fr]">
         <div>
           <label className={label}>{t.admin.agentPhoto}</label>

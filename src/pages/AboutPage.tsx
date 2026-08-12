@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import { motion } from 'framer-motion'
 import { Instagram, User, Mail, MessageCircle, Facebook, Music2 } from 'lucide-react'
 import { PublicLayout } from '../components/layout/PublicLayout'
@@ -44,44 +45,35 @@ export default function AboutPage() {
         </p>
       </section>
 
+      {/* Columnas iguales con separador dorado en escritorio, apiladas en el móvil.
+          Sirve para dos agentes, para tres o para los que se agreguen luego. */}
       <section className="container-luxe pb-24">
-        {agents.length === 2 ? (
-          <div className="grid items-start gap-12 sm:grid-cols-[1fr_auto_1fr] sm:gap-6">
-            <AgentBlock agent={agents[0]} lang={lang} align="right" />
-            {/* Center divider — side-by-side screens only */}
-            <div className="hidden sm:flex sm:flex-col sm:items-center sm:self-stretch">
-              <div className="h-full w-px bg-gradient-to-b from-transparent via-gold/40 to-transparent" />
-            </div>
-            <AgentBlock agent={agents[1]} lang={lang} align="left" />
-          </div>
-        ) : (
-          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-            {agents.map((a) => (
-              <AgentBlock key={a.id} agent={a} lang={lang} align="center" />
-            ))}
-          </div>
-        )}
+        <div className="flex flex-col items-stretch gap-14 sm:flex-row sm:gap-6 lg:gap-10">
+          {agents.map((agent, i) => (
+            <Fragment key={agent.id}>
+              {i > 0 && (
+                <div
+                  aria-hidden
+                  className="hidden w-px self-stretch bg-gradient-to-b from-transparent via-gold/40 to-transparent sm:block"
+                />
+              )}
+              <div className="min-w-0 sm:flex-1">
+                <AgentBlock agent={agent} lang={lang} />
+              </div>
+            </Fragment>
+          ))}
+        </div>
       </section>
     </PublicLayout>
   )
 }
 
-function AgentBlock({
-  agent,
-  lang,
-  align,
-}: {
-  agent: Agent
-  lang: 'es' | 'en'
-  align: 'left' | 'right' | 'center'
-}) {
+function AgentBlock({ agent, lang }: { agent: Agent; lang: 'es' | 'en' }) {
   const { t } = useLanguage()
   const bio = lang === 'es' ? agent.bioEs : agent.bioEn
-  const alignClass =
-    align === 'right' ? 'sm:items-end sm:text-right' : align === 'left' ? 'sm:items-start sm:text-left' : 'items-center text-center'
 
   return (
-    <Reveal className={`flex flex-col items-center text-center ${alignClass}`}>
+    <Reveal className="flex flex-col items-center text-center">
       <div className="relative">
         {agent.photo ? (
           <img

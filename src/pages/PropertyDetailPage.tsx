@@ -17,6 +17,7 @@ import {
 import { PublicLayout } from '../components/layout/PublicLayout'
 import { Gallery } from '../components/property/Gallery'
 import { LazyMap } from '../components/property/LazyMap'
+import { isValidLat, isValidLng } from '../lib/geo'
 import { StatusBadge } from '../components/property/StatusBadge'
 import { PropertyCard } from '../components/property/PropertyCard'
 import { Spinner } from '../components/ui/Spinner'
@@ -266,8 +267,8 @@ export default function PropertyDetailPage() {
               </Reveal>
             )}
 
-            {/* Map */}
-            {property.lat != null && property.lng != null && (
+            {/* Map — se oculta entero si la coordenada guardada no es dibujable */}
+            {isValidLat(property.lat) && isValidLng(property.lng) && (
               <Reveal>
                 <h2 className="flex items-center gap-2 font-display text-3xl text-cream">
                   <MapPin size={22} className="text-gold" /> {t.detail.location}

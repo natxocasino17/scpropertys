@@ -20,6 +20,15 @@ import {
 import type { AdminNote, Property } from '../../types/property'
 import { useAuth } from '../../context/AuthContext'
 import { parseVideo } from '../../lib/video'
+import {
+  parseCoordinate,
+  parseMapsInput,
+  isShortMapsLink,
+  isValidLat,
+  isValidLng,
+  isValidLatLng,
+  roundCoordinate,
+} from '../../lib/geo'
 import { slugify, classNames, formatPrice } from '../../lib/format'
 import type {
   PropertyInput,
@@ -139,8 +148,10 @@ export default function AdminPropertyFormPage() {
         construction_size: Number(form.construction_size) || 0,
         bedrooms: Number(form.bedrooms) || 0,
         bathrooms: Number(form.bathrooms) || 0,
-        lat: form.lat ? Number(form.lat) : null,
-        lng: form.lng ? Number(form.lng) : null,
+        // Última barrera: una coordenada fuera de rango nunca llega a la base.
+        // Se guardan las dos o ninguna, porque media coordenada no dibuja nada.
+        lat: isValidLatLng(form.lat, form.lng) ? Number(form.lat) : null,
+        lng: isValidLatLng(form.lat, form.lng) ? Number(form.lng) : null,
         video_url: form.video_url || null,
         agent_id: form.agent_id || null,
       }
@@ -421,26 +432,11 @@ export default function AdminPropertyFormPage() {
               <label className={label}>{t.detail.video}</label>
               <VideoInput value={form.video_url ?? ''} onChange={(v) => set('video_url', v)} />
             </div>
-            <div>
-              <label className={label}>Latitud</label>
-              <input
-                type="number"
-                step="any"
-                value={form.lat ?? ''}
-                onChange={(e) => set('lat', e.target.value ? Number(e.target.value) : null)}
-                placeholder="9.6553"
-                className={input}
-              />
-            </div>
-            <div>
-              <label className={label}>Longitud</label>
-              <input
-                type="number"
-                step="any"
-                value={form.lng ?? ''}
-                onChange={(e) => set('lng', e.target.value ? Number(e.target.value) : null)}
-                placeholder="-82.7541"
-                className={input}
+            <div className="md:col-span-2">
+              <LocationInput
+                lat={form.lat ?? null}
+                lng={form.lng ?? null}
+                onChange={(lat, lng) => setForm((f) => ({ ...f, lat, lng }))}
               />
             </div>
             <div className="flex items-end">
@@ -587,6 +583,130 @@ function VideoInput({ value, onChange }: { value: string; onChange: (v: string) 
           <iframe src={parsed.src} title="preview" className="h-full w-full" allowFullScreen />
         </div>
       )}
+    </div>
+  )
+}
+
+/**
+ * Ubicación de la propiedad: enlace de Google Maps o coordenadas a mano.
+ *
+ * Los campos son de TEXTO a propósito. Con <input type="number"> y el equipo en
+ * español, el navegador leía el punto como separador de miles y guardaba
+ * "-82.8020075916093" como -828020075916093, lo que reventaba el mapa.
+ */
+function LocationInput({
+  lat,
+  lng,
+  onChange,
+}: {
+  lat: number | null
+  lng: number | null
+  onChange: (lat: number | null, lng: number | null) => void
+}) {
+  const [link, setLink] = useState('')
+  const [linkState, setLinkState] = useState<'idle' | 'ok' | 'short' | 'error'>('idle')
+  // Texto crudo mientras se escribe, para no pelear con el cursor al teclear "-" o "9,"
+  const [draft, setDraft] = useState<{ lat: string; lng: string } | null>(null)
+
+  const input =
+    'w-full rounded-xl border border-white/15 bg-ink-800 px-4 py-2.5 text-sm text-cream placeholder:text-faint focus:border-gold focus:outline-none'
+  const labelCls = 'mb-1.5 block text-xs uppercase tracking-wide text-faint'
+
+  const shownLat = draft ? draft.lat : lat ?? ''
+  const shownLng = draft ? draft.lng : lng ?? ''
+
+  const commit = (nextLat: string, nextLng: string) => {
+    setDraft({ lat: nextLat, lng: nextLng })
+    const a = parseCoordinate(nextLat)
+    const b = parseCoordinate(nextLng)
+    onChange(
+      a !== null && isValidLat(a) ? roundCoordinate(a) : null,
+      b !== null && isValidLng(b) ? roundCoordinate(b) : null,
+    )
+  }
+
+  const applyLink = (value: string) => {
+    setLink(value)
+    if (!value.trim()) return setLinkState('idle')
+    if (isShortMapsLink(value)) return setLinkState('short')
+    const found = parseMapsInput(value)
+    if (!found) return setLinkState('error')
+    setDraft({ lat: String(found.lat), lng: String(found.lng) })
+    onChange(roundCoordinate(found.lat), roundCoordinate(found.lng))
+    setLinkState('ok')
+  }
+
+  const latError = shownLat !== '' && !isValidLat(parseCoordinate(String(shownLat)) ?? NaN)
+  const lngError = shownLng !== '' && !isValidLng(parseCoordinate(String(shownLng)) ?? NaN)
+
+  return (
+    <div>
+      <label className={labelCls}>Ubicación en el mapa</label>
+
+      <div className="relative">
+        <Link2 size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-faint" />
+        <input
+          value={link}
+          onChange={(e) => applyLink(e.target.value)}
+          placeholder="Pegá aquí el enlace de Google Maps"
+          className="w-full rounded-xl border border-white/15 bg-ink-800 py-2.5 pl-9 pr-3 text-sm text-cream placeholder:text-faint focus:border-gold focus:outline-none"
+        />
+      </div>
+
+      <div className="mt-2 rounded-xl border border-gold/25 bg-gold/5 px-3.5 py-2.5 text-xs leading-relaxed text-cream/80">
+        <strong className="text-gold">Ojo con el enlace corto.</strong> El que copia Google
+        (<code className="text-cream">maps.app.goo.gl/…</code>) <strong>no lleva las coordenadas
+        dentro</strong>. Pegalo primero en la barra de direcciones del navegador y dale enter: la
+        página se abre con el enlace largo, que sí las trae. Ese es el que hay que copiar acá —
+        el largo empieza por <code className="text-cream">google.com/maps/place/…</code> y tiene
+        una <code className="text-cream">@</code> con los números.
+      </div>
+
+      {linkState === 'ok' && (
+        <p className="mt-2 text-xs text-emerald-300">
+          ✓ Coordenadas tomadas del enlace. Revisá que el pin caiga donde toca.
+        </p>
+      )}
+      {linkState === 'short' && (
+        <p className="mt-2 text-xs text-amber-300">
+          Ese es el enlace corto y no trae coordenadas. Abrilo en el navegador y copiá el largo.
+        </p>
+      )}
+      {linkState === 'error' && (
+        <p className="mt-2 text-xs text-rose-300">
+          No encontré coordenadas en ese enlace. Podés escribirlas a mano abajo.
+        </p>
+      )}
+
+      <div className="mt-3 grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className={labelCls}>Latitud</label>
+          <input
+            inputMode="decimal"
+            value={shownLat}
+            onChange={(e) => commit(e.target.value, String(shownLng))}
+            placeholder="9.6553"
+            className={input}
+          />
+          {latError && <p className="mt-1 text-xs text-rose-300">Debe estar entre -90 y 90.</p>}
+        </div>
+        <div>
+          <label className={labelCls}>Longitud</label>
+          <input
+            inputMode="decimal"
+            value={shownLng}
+            onChange={(e) => commit(String(shownLat), e.target.value)}
+            placeholder="-82.7541"
+            className={input}
+          />
+          {lngError && <p className="mt-1 text-xs text-rose-300">Debe estar entre -180 y 180.</p>}
+        </div>
+      </div>
+
+      <p className="mt-2 text-xs text-faint">
+        Podés usar punto o coma para los decimales. Si dejás los dos campos vacíos, la propiedad
+        no muestra mapa.
+      </p>
     </div>
   )
 }

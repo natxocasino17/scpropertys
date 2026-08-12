@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react'
+import { isValidLatLng } from '../../lib/geo'
 
 const PropertyMap = lazy(() =>
   import('./PropertyMap').then((m) => ({ default: m.PropertyMap })),
@@ -14,6 +15,10 @@ interface LazyMapProps {
 
 /** Loads Leaflet only when a map is actually rendered (keeps it out of the main bundle). */
 export function LazyMap(props: LazyMapProps) {
+  // Una coordenada fuera de rango hace que Leaflet pida millones de tiles y
+  // tumbe la pestaña con "Out of Memory". Antes que eso, no dibujamos el mapa.
+  if (!isValidLatLng(props.lat, props.lng)) return null
+
   return (
     <Suspense
       fallback={

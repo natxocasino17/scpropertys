@@ -173,7 +173,7 @@ export default function ContactPage() {
               value={lang === 'es' ? settings.locationEs : settings.locationEn}
             />
 
-            {/* Both agents */}
+            {/* Todo el equipo, uno por fila */}
             {(settings.agents ?? []).map((a) => (
               <a
                 key={a.id}
