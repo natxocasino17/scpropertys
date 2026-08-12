@@ -13,7 +13,7 @@ import {
   logActivity,
 } from '../../lib/propertiesService'
 import { useAuth } from '../../context/AuthContext'
-import { formatPrice } from '../../lib/format'
+import { formatPrice, pickLang } from '../../lib/format'
 import type { Property } from '../../types/property'
 
 export default function AdminDashboardPage() {
@@ -75,7 +75,7 @@ export default function AdminDashboardPage() {
       setProperties((prev) => prev.filter((x) => x.id !== p.id))
       await logActivity({
         action: 'delete',
-        entity_title: (lang === 'es' ? p.title_es : p.title_en) || p.slug,
+        entity_title: pickLang(lang, p.title_es, p.title_en) || p.slug,
         detail: null,
         actor_email: user?.email ?? null,
       })
@@ -126,7 +126,7 @@ export default function AdminDashboardPage() {
         ) : (
           <div className="space-y-3">
             {properties.map((p, index) => {
-              const title = lang === 'es' ? p.title_es : p.title_en
+              const title = pickLang(lang, p.title_es, p.title_en)
               return (
                 <div
                   key={p.id}

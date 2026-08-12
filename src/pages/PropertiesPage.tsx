@@ -8,7 +8,7 @@ import { useProperties } from '../hooks/useProperties'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSettings } from '../context/SettingsContext'
 import { useSeo } from '../lib/seo'
-import { classNames } from '../lib/format'
+import { classNames, pickLang } from '../lib/format'
 import type { PropertyType } from '../types/property'
 
 type SortKey = 'new' | 'priceAsc' | 'priceDesc'
@@ -42,7 +42,7 @@ export default function PropertiesPage() {
 
   const filtered = useMemo(() => {
     let list = properties.filter((p) => {
-      const title = (lang === 'es' ? p.title_es : p.title_en).toLowerCase()
+      const title = pickLang(lang, p.title_es, p.title_en).toLowerCase()
       const matchSearch =
         !search ||
         title.includes(search.toLowerCase()) ||

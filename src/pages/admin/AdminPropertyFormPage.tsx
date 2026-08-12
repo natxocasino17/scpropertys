@@ -215,6 +215,11 @@ export default function AdminPropertyFormPage() {
       <form onSubmit={handleSubmit} className="mt-8 space-y-8">
         {/* Titles */}
         <Section title="ES / EN">
+          <div className="mb-4 rounded-xl border border-gold/25 bg-gold/5 px-3.5 py-2.5 text-xs leading-relaxed text-cream/80">
+            <strong className="text-gold">Con el español alcanza.</strong> Si dejás los campos en
+            inglés vacíos, la web en inglés muestra el texto en español en vez de un hueco. Llenalos
+            solo cuando quieras una redacción distinta para el visitante extranjero.
+          </div>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <label className={label}>{t.detail.overview} (ES) · Título</label>
@@ -226,10 +231,11 @@ export default function AdminPropertyFormPage() {
               />
             </div>
             <div>
-              <label className={label}>Title (EN)</label>
+              <label className={label}>Title (EN) · opcional</label>
               <input
                 value={form.title_en}
                 onChange={(e) => set('title_en', e.target.value)}
+                placeholder={form.title_es || 'Se usa el título en español'}
                 className={input}
               />
             </div>
@@ -243,11 +249,12 @@ export default function AdminPropertyFormPage() {
               />
             </div>
             <div>
-              <label className={label}>Description (EN)</label>
+              <label className={label}>Description (EN) · opcional</label>
               <textarea
                 rows={5}
                 value={form.description_en}
                 onChange={(e) => set('description_en', e.target.value)}
+                placeholder="Se usa la descripción en español"
                 className={`${input} resize-none`}
               />
             </div>

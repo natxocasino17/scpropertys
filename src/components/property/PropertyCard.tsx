@@ -4,14 +4,14 @@ import { MapPin, BedDouble, Bath, Maximize } from 'lucide-react'
 import type { Property } from '../../types/property'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { useSettings } from '../../context/SettingsContext'
-import { formatPrice, formatArea, classNames } from '../../lib/format'
+import { formatPrice, formatArea, classNames, pickLang } from '../../lib/format'
 import { StatusBadge } from './StatusBadge'
 import { typeIcon } from '../../lib/amenityIcons'
 
 export function PropertyCard({ property, index = 0 }: { property: Property; index?: number }) {
   const { t, lang } = useLanguage()
   const { settings } = useSettings()
-  const title = lang === 'es' ? property.title_es : property.title_en
+  const title = pickLang(lang, property.title_es, property.title_en)
   const TypeIcon = typeIcon[property.type]
   const cover = property.images[0]
   const agent = settings.agents?.find((a) => a.id === property.agent_id) ?? null

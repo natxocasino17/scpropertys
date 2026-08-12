@@ -25,7 +25,7 @@ import { Reveal } from '../components/ui/Reveal'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useProperties } from '../hooks/useProperties'
 import { fetchPropertyBySlug } from '../lib/propertiesService'
-import { formatPrice, formatArea, whatsappLink, whatsappLinkTo } from '../lib/format'
+import { formatPrice, formatArea, whatsappLink, whatsappLinkTo, pickLang } from '../lib/format'
 import { parseVideo } from '../lib/video'
 import { useSettings } from '../context/SettingsContext'
 import { useSeo } from '../lib/seo'
@@ -53,9 +53,9 @@ export default function PropertyDetailPage() {
   }, [slug])
 
   // SEO (hook must run every render — build from property when available)
-  const seoName = property ? (lang === 'es' ? property.title_es : property.title_en) : settings.brand
+  const seoName = property ? pickLang(lang, property.title_es, property.title_en) : settings.brand
   const seoDesc = property
-    ? (lang === 'es' ? property.description_es : property.description_en).replace(/\s+/g, ' ').slice(0, 160)
+    ? pickLang(lang, property.description_es, property.description_en).replace(/\s+/g, ' ').slice(0, 160)
     : ''
   const availabilityMap: Record<string, string> = {
     available: 'https://schema.org/InStock',
@@ -110,8 +110,8 @@ export default function PropertyDetailPage() {
     )
   }
 
-  const title = lang === 'es' ? property.title_es : property.title_en
-  const description = lang === 'es' ? property.description_es : property.description_en
+  const title = pickLang(lang, property.title_es, property.title_en)
+  const description = pickLang(lang, property.description_es, property.description_en)
   const TypeIcon = typeIcon[property.type]
 
   const specs = [

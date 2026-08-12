@@ -31,6 +31,23 @@ export function classNames(...parts: Array<string | false | null | undefined>): 
   return parts.filter(Boolean).join(' ')
 }
 
+/**
+ * Texto de un campo bilingüe, cayendo al otro idioma si ese lado está vacío.
+ *
+ * Así se puede cargar una propiedad escribiendo SOLO en español: la web en
+ * inglés muestra el texto español en vez de un hueco en blanco. Cuando la
+ * traducción existe, manda la traducción.
+ */
+export function pickLang(
+  lang: 'es' | 'en',
+  es: string | null | undefined,
+  en: string | null | undefined,
+): string {
+  const primary = (lang === 'es' ? es : en) ?? ''
+  if (primary.trim()) return primary
+  return (lang === 'es' ? en : es) ?? ''
+}
+
 export function slugify(input: string): string {
   return input
     .toLowerCase()
