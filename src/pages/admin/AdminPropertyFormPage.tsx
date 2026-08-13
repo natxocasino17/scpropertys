@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, Save, Loader2, Check } from 'lucide-react'
+import { ArrowLeft, Save, Loader2, Check, Languages } from 'lucide-react'
 import { AdminLayout } from '../../components/admin/AdminLayout'
 import { ImageManager } from '../../components/admin/ImageManager'
 import { AdminNotes } from '../../components/admin/AdminNotes'
@@ -20,6 +20,7 @@ import {
 import type { AdminNote, Property } from '../../types/property'
 import { useAuth } from '../../context/AuthContext'
 import { parseVideo } from '../../lib/video'
+import { translateText } from '../../lib/translate'
 import {
   parseCoordinate,
   parseMapsInput,
@@ -80,7 +81,36 @@ export default function AdminPropertyFormPage() {
   const [form, setForm] = useState<PropertyInput>(empty)
   const [notes, setNotes] = useState<AdminNote[]>([])
   const [loading, setLoading] = useState(isEdit)
+  const [translating, setTranslating] = useState(false)
+  const [translateMsg, setTranslateMsg] = useState<{ ok: boolean; text: string } | null>(null)
   const originalRef = useRef<Property | null>(null)
+
+  /**
+   * Rellena los campos en inglés a partir del español.
+   * No pisa nada sin avisar y deja el resultado editable: la traducción
+   * automática acierta casi siempre, pero conviene darle un repaso.
+   */
+  async function translateToEnglish() {
+    const yaHayIngles = form.title_en.trim() || form.description_en.trim()
+    if (yaHayIngles && !confirm('Ya hay texto en inglés. ¿Reemplazarlo por la traducción?')) return
+
+    setTranslating(true)
+    setTranslateMsg(null)
+    try {
+      // Una detrás de otra, no en paralelo: el servicio gratuito limita ráfagas.
+      const title = await translateText(form.title_es)
+      const description = await translateText(form.description_es)
+      setForm((f) => ({ ...f, title_en: title, description_en: description }))
+      setTranslateMsg({ ok: true, text: 'Listo — repasalo antes de guardar.' })
+    } catch (err) {
+      setTranslateMsg({
+        ok: false,
+        text: err instanceof Error ? err.message : 'No se pudo traducir. Probá de nuevo.',
+      })
+    } finally {
+      setTranslating(false)
+    }
+  }
 
   /** The agent whose email matches the logged-in user (used to auto-assign). */
   const myAgent = settings.agents?.find(
@@ -217,8 +247,30 @@ export default function AdminPropertyFormPage() {
         <Section title="ES / EN">
           <div className="mb-4 rounded-xl border border-gold/25 bg-gold/5 px-3.5 py-2.5 text-xs leading-relaxed text-cream/80">
             <strong className="text-gold">Con el español alcanza.</strong> Si dejás los campos en
-            inglés vacíos, la web en inglés muestra el texto en español en vez de un hueco. Llenalos
-            solo cuando quieras una redacción distinta para el visitante extranjero.
+            inglés vacíos, la web en inglés muestra el texto en español en vez de un hueco. Y si
+            querés el inglés de verdad, escribí el español y dale al botón de traducir.
+          </div>
+
+          <div className="mb-4 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={translateToEnglish}
+              disabled={translating || !form.title_es.trim()}
+              className="inline-flex items-center gap-2 rounded-full border border-gold/40 px-4 py-2 text-xs text-gold transition-colors hover:bg-gold/10 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {translating ? <Loader2 size={15} className="animate-spin" /> : <Languages size={15} />}
+              {translating ? 'Traduciendo…' : 'Traducir al inglés'}
+            </button>
+            {translateMsg && (
+              <span
+                className={classNames(
+                  'text-xs',
+                  translateMsg.ok ? 'text-emerald-300' : 'text-rose-300',
+                )}
+              >
+                {translateMsg.text}
+              </span>
+            )}
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
