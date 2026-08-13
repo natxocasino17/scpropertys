@@ -4,6 +4,12 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  # Vite incrusta las variables VITE_* dentro del JavaScript del navegador: es la
+  # unica forma de que la web hable con Supabase, y son publicas por diseno (lo
+  # que protege los datos es el RLS de Supabase, no ocultar la clave anon).
+  # Sin esto, el escaner de secretos de Netlify las encuentra en /dist y aborta
+  # el deploy.
+  SECRETS_SCAN_OMIT_KEYS = "VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY,VITE_DB_PREFIX"
 
 # SPA fallback so React Router routes (e.g. /admin, /propiedades/...) work on refresh
 [[redirects]]
