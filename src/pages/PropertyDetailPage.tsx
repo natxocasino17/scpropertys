@@ -236,6 +236,23 @@ export default function PropertyDetailPage() {
               </div>
             </Reveal>
 
+            {/* Map — antes de la descripción: la ubicación es lo primero que
+                se pregunta. Se oculta entero si la coordenada no es dibujable. */}
+            {isValidLat(property.lat) && isValidLng(property.lng) && (
+              <Reveal>
+                <h2 className="flex items-center gap-2 font-display text-3xl text-cream">
+                  <MapPin size={22} className="text-gold" /> {t.detail.location}
+                </h2>
+                <div className="divider-gold mt-4 !mx-0" />
+                <LazyMap
+                  lat={property.lat}
+                  lng={property.lng}
+                  label={title}
+                  className="mt-6 h-80"
+                />
+              </Reveal>
+            )}
+
             {/* Overview */}
             <Reveal>
               <h2 className="font-display text-3xl text-cream">{t.detail.overview}</h2>
@@ -264,22 +281,6 @@ export default function PropertyDetailPage() {
                     )
                   })}
                 </div>
-              </Reveal>
-            )}
-
-            {/* Map — se oculta entero si la coordenada guardada no es dibujable */}
-            {isValidLat(property.lat) && isValidLng(property.lng) && (
-              <Reveal>
-                <h2 className="flex items-center gap-2 font-display text-3xl text-cream">
-                  <MapPin size={22} className="text-gold" /> {t.detail.location}
-                </h2>
-                <div className="divider-gold mt-4 !mx-0" />
-                <LazyMap
-                  lat={property.lat}
-                  lng={property.lng}
-                  label={title}
-                  className="mt-6 h-80"
-                />
               </Reveal>
             )}
           </div>
