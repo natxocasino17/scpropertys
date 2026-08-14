@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, forwardRef, useImperativeHandle } from 'react'
 import { Paperclip, Trash2, Loader2, FileText, ImageIcon, Download, Plus } from 'lucide-react'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { useSettings } from '../../context/SettingsContext'
@@ -11,13 +11,19 @@ function uid() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 
-export function AdminNotes({
-  notes,
-  onChange,
-}: {
-  notes: AdminNote[]
-  onChange: (notes: AdminNote[]) => void
-}) {
+export interface AdminNotesHandle {
+  /**
+   * Convierte en nota lo que haya quedado a medio escribir y devuelve la lista
+   * definitiva. La llama el formulario antes de guardar, para que una nota
+   * escrita sin pulsar "Agregar nota" no se pierda en silencio.
+   */
+  flushPending: () => AdminNote[]
+}
+
+export const AdminNotes = forwardRef<
+  AdminNotesHandle,
+  { notes: AdminNote[]; onChange: (notes: AdminNote[]) => void }
+>(function AdminNotes({ notes, onChange }, ref) {
   const { t } = useLanguage()
   const { settings } = useSettings()
   const { user } = useAuth()
@@ -60,8 +66,9 @@ export function AdminNotes({
     }
   }
 
-  function addNote() {
-    if (!text.trim() && files.length === 0) return
+  /** Construye la nota pendiente (si hay algo escrito o adjunto) y devuelve la lista resultante. */
+  function commitPending(): AdminNote[] {
+    if (!text.trim() && files.length === 0) return notes
     const note: AdminNote = {
       id: uid(),
       text: text.trim(),
@@ -69,10 +76,21 @@ export function AdminNotes({
       files,
       created_at: new Date().toISOString(),
     }
-    onChange([note, ...notes])
+    const next = [note, ...notes]
+    onChange(next)
     setText('')
     setFiles([])
+    return next
   }
+
+  function addNote() {
+    commitPending()
+  }
+
+  // El formulario la invoca al guardar la propiedad.
+  useImperativeHandle(ref, () => ({ flushPending: commitPending }))
+
+  const hasPending = Boolean(text.trim()) || files.length > 0
 
   function deleteNote(id: string) {
     onChange(notes.filter((n) => n.id !== id))
@@ -147,6 +165,12 @@ export function AdminNotes({
             <Plus size={15} /> {t.admin.addNote}
           </button>
         </div>
+
+        {hasPending && (
+          <p className="mt-3 text-xs text-gold/80">
+            Esta nota se agrega al guardar la propiedad, aunque no pulses el botón.
+          </p>
+        )}
       </div>
 
       {/* Existing notes */}
@@ -187,7 +211,7 @@ export function AdminNotes({
       )}
     </div>
   )
-}
+})
 
 function PrivateFileChip({ file }: { file: AdminNoteFile }) {
   const [loading, setLoading] = useState(false)

@@ -177,7 +177,15 @@ export async function fetchActivity(limit = 200): Promise<ActivityLog[]> {
 
 /* ───────────── Admin-only property notes (separate, private table) ───────────── */
 
-export async function fetchPropertyNotes(propertyId: string): Promise<AdminNote[]> {
+/**
+ * Notas de una propiedad.
+ *
+ * Devuelve `null` cuando la lectura FALLA, que no es lo mismo que "no hay
+ * notas" (eso es `[]`). El formulario necesita distinguirlo: si al abrir no se
+ * pudieron leer y guardara igual, sobrescribiría las notas existentes con una
+ * lista vacía y se perderían sin dejar rastro.
+ */
+export async function fetchPropertyNotes(propertyId: string): Promise<AdminNote[] | null> {
   const supabase = getSupabase()
   if (!supabase || !propertyId) return []
   const { data, error } = await supabase
@@ -185,8 +193,35 @@ export async function fetchPropertyNotes(propertyId: string): Promise<AdminNote[
     .select('notes')
     .eq('property_id', propertyId)
     .maybeSingle()
-  if (error || !data) return []
-  return (data.notes as AdminNote[]) ?? []
+  if (error) return null
+  return ((data?.notes as AdminNote[]) ?? [])
+}
+
+export interface NoteSummary {
+  notes: number
+  files: number
+}
+
+/**
+ * Cuántas notas y cuántos adjuntos tiene cada propiedad, para poder marcarlas
+ * en el tablón: si no se ven desde la lista, nadie sabe que existen.
+ */
+export async function fetchNoteSummaries(): Promise<Record<string, NoteSummary>> {
+  const supabase = getSupabase()
+  if (!supabase) return {}
+  const { data, error } = await supabase.from(TABLES.notes).select('property_id, notes')
+  if (error || !data) return {}
+
+  const out: Record<string, NoteSummary> = {}
+  for (const row of data as { property_id: string; notes: AdminNote[] | null }[]) {
+    const list = row.notes ?? []
+    if (!list.length) continue
+    out[row.property_id] = {
+      notes: list.length,
+      files: list.reduce((n, note) => n + (note.files?.length ?? 0), 0),
+    }
+  }
+  return out
 }
 
 export async function savePropertyNotes(propertyId: string, notes: AdminNote[]): Promise<void> {

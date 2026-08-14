@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Pencil, Trash2, ImageOff, Download, Loader2, ChevronUp, ChevronDown } from 'lucide-react'
+import { Plus, Pencil, Trash2, ImageOff, Download, Loader2, ChevronUp, ChevronDown, Paperclip } from 'lucide-react'
 import { AdminLayout } from '../../components/admin/AdminLayout'
 import { Spinner } from '../../components/ui/Spinner'
 import { StatusBadge } from '../../components/property/StatusBadge'
@@ -11,6 +11,8 @@ import {
   importDemoProperties,
   setPropertyPositions,
   logActivity,
+  fetchNoteSummaries,
+  type NoteSummary,
 } from '../../lib/propertiesService'
 import { useAuth } from '../../context/AuthContext'
 import { formatPrice, pickLang } from '../../lib/format'
@@ -24,6 +26,8 @@ export default function AdminDashboardPage() {
   const [deleting, setDeleting] = useState<string | null>(null)
   const [importing, setImporting] = useState(false)
   const [savingOrder, setSavingOrder] = useState(false)
+  /** Notas privadas por propiedad, para marcarlas en la lista. */
+  const [noteSummaries, setNoteSummaries] = useState<Record<string, NoteSummary>>({})
 
   async function move(index: number, dir: -1 | 1) {
     const target = index + dir
@@ -65,6 +69,7 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     load()
+    fetchNoteSummaries().then(setNoteSummaries)
   }, [])
 
   async function handleDelete(p: Property) {
@@ -165,6 +170,25 @@ export default function AdminDashboardPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className="truncate font-display text-lg text-cream">{title}</h3>
+                      {noteSummaries[p.id] && (
+                        <Link
+                          to={`/admin/properties/${p.id}`}
+                          title={`${noteSummaries[p.id].notes} nota(s) privada(s)${
+                            noteSummaries[p.id].files
+                              ? ` · ${noteSummaries[p.id].files} archivo(s)`
+                              : ''
+                          }`}
+                          className="inline-flex shrink-0 items-center gap-1 rounded-full border border-gold/40 bg-gold/10 px-2 py-0.5 text-[11px] text-gold transition-colors hover:bg-gold/20"
+                        >
+                          🔒 {noteSummaries[p.id].notes}
+                          {noteSummaries[p.id].files > 0 && (
+                            <>
+                              <Paperclip size={11} />
+                              {noteSummaries[p.id].files}
+                            </>
+                          )}
+                        </Link>
+                      )}
                     </div>
                     <div className="mt-1 flex items-center gap-3 text-xs text-mist">
                       <span>{p.zone}</span>

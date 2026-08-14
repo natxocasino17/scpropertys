@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, Save, Loader2, Check, Languages } from 'lucide-react'
 import { AdminLayout } from '../../components/admin/AdminLayout'
 import { ImageManager } from '../../components/admin/ImageManager'
-import { AdminNotes } from '../../components/admin/AdminNotes'
+import { AdminNotes, type AdminNotesHandle } from '../../components/admin/AdminNotes'
 import { Spinner } from '../../components/ui/Spinner'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { useSettings } from '../../context/SettingsContext'
@@ -80,6 +80,9 @@ export default function AdminPropertyFormPage() {
 
   const [form, setForm] = useState<PropertyInput>(empty)
   const [notes, setNotes] = useState<AdminNote[]>([])
+  /** Una propiedad nueva no tiene nada que leer; al editar, solo tras leerlas bien. */
+  const [notesLoaded, setNotesLoaded] = useState(!isEdit)
+  const notesRef = useRef<AdminNotesHandle>(null)
   const [loading, setLoading] = useState(isEdit)
   const [translating, setTranslating] = useState(false)
   const [translateMsg, setTranslateMsg] = useState<{ ok: boolean; text: string } | null>(null)
@@ -139,7 +142,11 @@ export default function AdminPropertyFormPage() {
           setForm({ ...empty, ...rest, video_url: p.video_url ?? '' })
           setSlugTouched(true)
         }
-        setNotes(n)
+        // n === null significa que la lectura fallo, no que no haya notas.
+        if (n !== null) {
+          setNotes(n)
+          setNotesLoaded(true)
+        }
       })
       .finally(() => setLoading(false))
   }, [id, isEdit])
@@ -188,7 +195,12 @@ export default function AdminPropertyFormPage() {
       const saved = isEdit
         ? await updateProperty(id!, payload)
         : await createProperty(payload)
-      await savePropertyNotes(saved.id, notes)
+
+      // Recoge la nota que se haya quedado escrita sin pulsar "Agregar nota":
+      // antes se descartaba en silencio y los archivos ya subidos quedaban sueltos.
+      const finalNotes = notesRef.current?.flushPending() ?? notes
+      // Si al abrir no se pudieron leer, no se guardan: seria pisarlas con una lista vacia.
+      if (notesLoaded) await savePropertyNotes(saved.id, finalNotes)
 
       // Change history
       const propTitle = form.title_es || form.title_en || saved.slug
@@ -511,7 +523,7 @@ export default function AdminPropertyFormPage() {
         {/* Private admin notes */}
         <Section title={`🔒 ${t.admin.notesSection}`}>
           <p className="mb-4 text-xs text-faint">{t.admin.notesHint}</p>
-          <AdminNotes notes={notes} onChange={setNotes} />
+          <AdminNotes ref={notesRef} notes={notes} onChange={setNotes} />
         </Section>
 
         {error && (
