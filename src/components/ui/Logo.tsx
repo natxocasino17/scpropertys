@@ -1,28 +1,23 @@
 import { Link } from 'react-router-dom'
 import { useSettings } from '../../context/SettingsContext'
+import { LogoMark } from './LogoMark'
 
 interface LogoProps {
   className?: string
   onClick?: () => void
 }
 
-/** Elegant typographic logotype with a minimalist gold monogram. */
+/** La marca (tejado + ola) sobre el nombre compuesto en dos líneas. */
 export function Logo({ className = '', onClick }: LogoProps) {
   const { settings } = useSettings()
   return (
     <Link to="/" onClick={onClick} className={`group inline-flex items-center gap-3 ${className}`}>
-      <span className="relative grid h-9 w-9 place-items-center rounded-full border border-gold/40 transition-colors duration-500 group-hover:border-gold">
-        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none">
-          <path
-            d="M5 18V9l7-5 7 5v9h-4.5v-5h-5v5z"
-            stroke="#C8A45D"
-            strokeWidth="1.4"
-            strokeLinejoin="round"
-            strokeLinecap="round"
-          />
-        </svg>
-        <span className="absolute -right-0.5 -top-0.5 h-1.5 w-1.5 rounded-full bg-gold-light" />
-      </span>
+      {/* El trazo se engorda un poco: al tamaño de la cabecera, el grosor
+          original del dibujo quedaría demasiado fino. */}
+      <LogoMark
+        strokeWidth={30}
+        className="h-[18px] w-16 shrink-0 text-gold transition-colors duration-500 group-hover:text-gold-light"
+      />
       <span className="flex flex-col leading-none">
         <span className="font-display text-lg font-semibold tracking-wide text-cream">
           {settings.brand}
