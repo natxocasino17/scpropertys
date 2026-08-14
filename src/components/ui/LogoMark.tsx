@@ -25,8 +25,12 @@ export const LOGO_PATH =
 /** Caja del trazado ya contando el medio grosor de la línea. */
 export const LOGO_VIEWBOX = '231 496 828 236'
 
+/** Proporción ancho/alto del trazado, para reservarle sitio sin deformarlo. */
+export const LOGO_RATIO = 828 / 236
+
 interface LogoMarkProps {
   className?: string
+  style?: React.CSSProperties
   /**
    * Grosor de la línea en las unidades del trazado (el original usa 22).
    * Conviene subirlo en tamaños pequeños para que la línea no se esfume.
@@ -34,12 +38,13 @@ interface LogoMarkProps {
   strokeWidth?: number
 }
 
-export function LogoMark({ className = '', strokeWidth = 22 }: LogoMarkProps) {
+export function LogoMark({ className = '', style, strokeWidth = 22 }: LogoMarkProps) {
   return (
     <svg
       viewBox={LOGO_VIEWBOX}
       fill="none"
       className={className}
+      style={style}
       aria-hidden="true"
       focusable="false"
     >

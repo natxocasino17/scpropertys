@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { Lock, Mail, ArrowRight } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../i18n/LanguageContext'
-import { Logo } from '../../components/ui/Logo'
+import { LogoStacked } from '../../components/ui/Logo'
 import { NotConfigured } from './NotConfigured'
 import { useNoIndex } from '../../lib/seo'
 
@@ -48,7 +48,7 @@ export default function AdminLoginPage() {
         className="relative w-full max-w-md"
       >
         <div className="mb-8 flex justify-center">
-          <Logo />
+          <LogoStacked width={230} />
         </div>
 
         <div className="glass rounded-3xl p-8">
